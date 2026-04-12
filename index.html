@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="icon" type="image/png" href="finallogo.png">
-    <link rel="apple-touch-icon" href="applelogo.png">
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="apple-touch-icon" href="finallogo.png">
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Joax</title>
@@ -375,7 +375,10 @@ Get your free demo
 
 <div>
 <a class="btn primary" href="quote-demo.html">Test it yourself</a>
-<a class="btn secondary" href="#cta">Get your free demo</a>
+<a class="btn secondary" href="#"
+onclick="document.getElementById('cta').scrollIntoView({behavior:'smooth'}); return false;">
+Get your free demo
+</a>
 </div>
 </section>
 
@@ -462,9 +465,13 @@ Get your free demo
 If filling out the form isn’t enough to fully explain your pricing logic, or you have any questions about how Joax calculates your quotes, you can book a quick call with us. We’ll go through your business setup and make sure everything is tailored correctly.
 </p>
 
-<form class="form" name="joax-leads" method="POST" data-netlify="true">
+<form class="form" action="https://formsubmit.co/joxagency666@gmail.com
+" method="POST">
 
-<input type="hidden" name="form-name" value="joax-leads">
+<input type="hidden" name="_subject" value="New Joax Lead Form Submission">
+<input type="hidden" name="_captcha" value="false">
+<input type="hidden" name="_template" value="table">
+<input type="hidden" name="_next" value="https://joax.online/thank-you.html">
 
 <label>Name</label>
 <input name="name" required />
@@ -472,7 +479,7 @@ If filling out the form isn’t enough to fully explain your pricing logic, or y
 <label>Business Name</label>
 <input name="business" required />
 
-<label>Business Website</label>
+<label>Website</label>
 <input name="website" />
 
 <label>Email</label>
@@ -484,12 +491,11 @@ If filling out the form isn’t enough to fully explain your pricing logic, or y
 <label>How do you currently calculate quotes?</label>
 <textarea name="current_logic"></textarea>
 
-<label>Any special rules or pricing logic?</label>
+<label>Any special rules?</label>
 <textarea name="pricing_rules"></textarea>
 
 <button class="btn primary" type="submit">Send & Get Demo</button>
 
-<input type="hidden" name="redirect" value="/thank-you.html">
 </form>
 
 <div style="margin-top:10px">
