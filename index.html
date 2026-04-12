@@ -78,6 +78,8 @@ display:inline-block;
 font-weight:600;
 margin:6px;
 transition:.2s;
+border:none;
+cursor:pointer;
 }
 
 .primary{
@@ -172,20 +174,49 @@ position:fixed;
 bottom:20px;
 right:20px;
 }
-
 </style>
 </head>
 
 <body>
 
+<!-- Calendly -->
+<link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
+<script src="https://assets.calendly.com/assets/external/widget.js" async></script>
+
 <nav>
 <div><b>Joax</b></div>
+
 <div>
-<a href="#demo">Demo</a>
-<a href="#pricing">The logic behind it</a>
-<a href="#comparison">Before vs After</a>
-<a href="#cta">Get your free demo</a>
-<!-- Instagram Icon -->
+    <!-- Book Meeting CTA -->
+<a href="#"
+onclick="Calendly.initPopupWidget({url: 'https://calendly.com/joax_automation'}); return false;"
+style="
+margin-left:12px;
+background:linear-gradient(135deg,var(--primary),var(--secondary));
+color:white;
+padding:10px 14px;
+border-radius:10px;
+font-weight:600;
+font-size:14px;
+text-decoration:none;
+box-shadow:var(--shadow);
+">
+Book a Meeting
+</a>
+<a href="#cta"style="
+margin-left:12px;
+background:linear-gradient(135deg,var(--primary),var(--secondary));
+color:white;
+padding:10px 14px;
+border-radius:10px;
+font-weight:600;
+font-size:14px;
+text-decoration:none;
+box-shadow:var(--shadow);
+">Get your free demo</a>
+
+
+<!-- Instagram -->
 <a href="https://instagram.com/Joax_automation" target="_blank" style="margin-left:18px; display:inline-flex; align-items:center; gap:6px;">
 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
@@ -194,8 +225,8 @@ right:20px;
 </svg>
 </a>
 </div>
-</div>
 </nav>
+
 
 <section class="hero">
 <h1>Automated Quote System for Moving Companies</h1>
@@ -239,24 +270,22 @@ right:20px;
 <h3>Full Calculation System Includes</h3>
 <ul>
 <li>Cubic volume (m³-based pricing model)</li>
-<li>Room-based estimation (1–5+ bedroom scaling)</li>
+<li>Room-based estimation</li>
 <li>Hybrid logic (rooms + items + volume)</li>
-<li>Labor calculation (per mover / per hour)</li>
+<li>Labor calculation</li>
 <li>Distance & zone pricing</li>
-<li>Access difficulty (stairs, elevators, long carry)</li>
-<li>Heavy items (pianos, safes, appliances)</li>
-<li>Disassembly / assembly cost rules</li>
-<li>Truck loading & stacking optimization</li>
-<li>Custom business rule engine (fully editable logic)</li>
+<li>Access difficulty</li>
+<li>Heavy items pricing</li>
+<li>Disassembly / assembly rules</li>
+<li>Truck optimization</li>
+<li>Custom rule engine</li>
 </ul>
 </div>
 
 <div class="box">
 <h3>Why Joax Is Different</h3>
-<p>Traditional moving companies rely on human estimators who interpret jobs differently, leading to inconsistent pricing and lost revenue.</p>
-<p>Joax turns your entire pricing logic into a structured automated system that behaves exactly like your best estimator — every single time.</p>
-<p>You can replicate your existing system OR upgrade it into a more advanced automated pricing model without changing your business model.</p>
-<p><b>Designed to eliminate human inconsistency and reduce pricing errors close to zero.</b></p>
+<p>Joax turns your pricing logic into a structured automated system that behaves exactly like your best estimator.</p>
+<p><b>Designed to eliminate human inconsistency and increase conversions.</b></p>
 </div>
 </div>
 </section>
@@ -268,55 +297,65 @@ right:20px;
 <div class="box">
 <h3 style="color:#EF4444">Before Joax</h3>
 <ul>
-<li>Manual quoting (10–60 minutes)</li>
-<li>Estimator-dependent pricing</li>
+<li>Manual quoting</li>
+<li>Slow responses</li>
 <li>Human inconsistency</li>
-<li>Slow response times</li>
-<li>Lost leads</li>
 </ul>
 </div>
 
 <div class="box">
 <h3 style="color:#22C55E">After Joax</h3>
 <ul>
-<li>Instant automated quotes</li>
-<li>Unified pricing logic</li>
-<li>Consistent outputs every time</li>
-<li>24/7 automated responses</li>
-<li>Higher conversion rate</li>
+<li>Instant quotes</li>
+<li>Consistent pricing</li>
+<li>Higher conversion</li>
 </ul>
 </div>
 </div>
 </section>
 
 <section id="cta" class="section">
-<h2 class="section-title">Fill your info to get a free demo in less than 24 hours</h2>
-<p>Expect a call/email from us if we need any more details to finish your demo</p>
+<h2 class="section-title">Get Your Free Demo</h2>
 
-<div class="form">
+<p style="color:var(--muted); max-width:750px;">
+If filling out the form isn’t enough to fully explain your pricing logic, or you have any questions about how Joax calculates your quotes, you can book a quick call with us. We’ll go through your business setup and make sure everything is tailored correctly.
+</p>
+
+<form class="form" action="https://formspree.io/f/xyklgdvn" method="POST">
+
 <label>Name</label>
-<input />
+<input name="name" required />
 
 <label>Business Name</label>
-<input />
+<input name="business" required />
 
 <label>Business Website</label>
-<input />
+<input name="website" />
 
 <label>Email</label>
-<input />
+<input name="email" type="email" required />
 
 <label>Phone</label>
-<input />
+<input name="phone" />
 
 <label>How do you currently calculate quotes?</label>
-<textarea></textarea>
+<textarea name="current_logic"></textarea>
 
 <label>Any special rules or pricing logic?</label>
-<textarea></textarea>
+<textarea name="pricing_rules"></textarea>
+<div style="margin-top:10px">
+<button class="btn primary" type="submit">Send & Get Demo</button>
+</div>
+<input type="hidden" name="_next" value="https://joax.online/thank-you.html">
+</form>
 
 <div style="margin-top:10px">
-<a class="btn primary" href="#">Launch Demo</a>
+
+<button class="btn primary"
+onclick="Calendly.initPopupWidget({url: 'https://calendly.com/joax_automation'}); return false;">
+Book a Meeting
+</button>
+
 </div>
 </div>
 </section>
