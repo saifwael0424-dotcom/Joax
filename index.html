@@ -245,6 +245,72 @@ input,textarea{
   font-size:16px; /* prevents iOS zoom */
 }
 }
+@media (max-width: 768px){
+
+body{
+  text-align:center;
+}
+
+/* Fix sections */
+.section{
+  padding:60px 16px;
+}
+
+/* Center all text blocks */
+.hero p,
+.section p,
+.box p,
+li{
+  text-align:center;
+}
+
+/* Fix lists */
+ul{
+  padding-left:0;
+  list-style-position:inside;
+}
+
+/* Fix buttons layout */
+.hero div{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:10px;
+}
+
+/* Buttons full width */
+.btn{
+  width:100%;
+  max-width:320px;
+}
+
+/* Fix nav */
+nav{
+  flex-direction:column;
+  align-items:center;
+  text-align:center;
+}
+
+nav div{
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:10px;
+}
+
+/* Fix form */
+.form{
+  text-align:left;
+}
+
+input, textarea{
+  font-size:16px;
+}
+
+/* Prevent overflow */
+body, html{
+  overflow-x:hidden;
+}
+}
 </style>
 </head>
 
@@ -274,7 +340,10 @@ box-shadow:var(--shadow);
 ">
 Book a Meeting
 </a>
-<a href="#cta"style="
+
+<a href="#"
+onclick="document.getElementById('cta').scrollIntoView({behavior:'smooth'}); return false;"
+style="
 margin-left:12px;
 background:linear-gradient(135deg,var(--primary),var(--secondary));
 color:white;
@@ -284,8 +353,9 @@ font-weight:600;
 font-size:14px;
 text-decoration:none;
 box-shadow:var(--shadow);
-">Get your free demo</a>
-
+">
+Get your free demo
+</a>
 
 <!-- Instagram -->
 <a href="https://instagram.com/Joax_automation" target="_blank" style="margin-left:18px; display:inline-flex; align-items:center; gap:6px;">
@@ -399,8 +469,14 @@ If filling out the form isn’t enough to fully explain your pricing logic, or y
 <label>Name</label>
 <input name="name" required />
 
+<label>Business Name</label>
+<input name="business" required />
+
+<label>Business Website</label>
+<input name="website" />
+
 <label>Email</label>
-<input name="email" required />
+<input name="email" type="email" required />
 
 <label>Phone</label>
 <input name="phone" />
@@ -408,11 +484,12 @@ If filling out the form isn’t enough to fully explain your pricing logic, or y
 <label>How do you currently calculate quotes?</label>
 <textarea name="current_logic"></textarea>
 
-<label>Any special rules?</label>
+<label>Any special rules or pricing logic?</label>
 <textarea name="pricing_rules"></textarea>
 
 <button class="btn primary" type="submit">Send & Get Demo</button>
 
+<input type="hidden" name="redirect" value="/thank-you.html">
 </form>
 
 <div style="margin-top:10px">
