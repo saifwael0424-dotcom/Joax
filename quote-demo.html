@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>60 Second Quote</title>
+
+  <style>
+ :root{
+  --bg:#F1F5F9;
+  --panel:#FFFFFF;
+  --border:#E2E8F0;
+  --text:#0F172A;
+  --muted:#475569;
+
+  --primary:#0EA5E9;
+  --secondary:#6366F1;
+
+  --shadow:0 10px 30px rgba(15,23,42,0.08);
+}
+
+/* GLOBAL */
+body{
+  margin:0;
+  font-family: Inter, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* PAGE WRAPPER */
+.container{
+  max-width: 1000px;
+  margin: 50px auto;
+  background: var(--panel);
+  padding: 35px;
+  border-radius: 18px;
+  border:1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+/* TITLE */
+h1{
+  text-align:center;
+  font-size:42px;
+  margin-bottom:5px;
+  background: linear-gradient(135deg,var(--primary),var(--secondary));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+h2{
+  text-align:center;
+  font-size:42px;
+  margin-bottom:5px;
+  background: linear-gradient(135deg,var(--primary),var(--secondary));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+h3{
+  text-align:center;
+  font-size:20px;
+  margin-bottom:5px;
+  background: linear-gradient(135deg,var(--primary),var(--secondary));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+p{
+  text-align:center;
+  font-size:20px;
+  margin-bottom:35px;
+  background: linear-gradient(135deg,var(--primary),var(--secondary));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+/* FORM GRID */
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+}
+
+/* INPUTS */
+label{
+  font-size:13px;
+  color:var(--muted);
+  margin-bottom:6px;
+  display:block;
+  font-weight:500;
+}
+
+input, select, textarea{
+  width:100%;
+  padding:12px;
+  border-radius:12px;
+  border:1px solid var(--border);
+  background:#F8FAFC;
+  outline:none;
+  transition:0.2s;
+}
+
+input:focus, select:focus, textarea:focus{
+  border-color: var(--primary);
+  box-shadow:0 0 0 3px rgba(14,165,233,0.15);
+}
+
+/* TEXTAREA */
+textarea{
+  min-height:90px;
+  resize:vertical;
+}
+
+/* FULL WIDTH FIELD */
+.full{
+  grid-column: span 2;
+}
+
+/* BUTTON */
+button{
+  width:100%;
+  padding:15px;
+  margin-top:10px;
+  border:none;
+  border-radius:14px;
+  background: linear-gradient(135deg,var(--primary),var(--secondary));
+  color:white;
+  font-weight:700;
+  cursor:pointer;
+  box-shadow: var(--shadow);
+  transition:0.25s;
+}
+
+button:hover{
+  transform:translateY(-2px);
+  opacity:0.95;
+}
+
+/* SECTION CARDS (optional grouping) */
+.section-box{
+  margin-top:20px;
+  padding:18px;
+  border:1px solid var(--border);
+  border-radius:14px;
+  background:#FFFFFF;
+}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .grid{
+    grid-template-columns:1fr;
+  }
+  .full{
+    grid-column: span 1;
+  }
+}
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+<h2>This is a live demo system</h2>
+
+<h3>
+This demo is based on a real client pricing model and shows how Joax instantly calculates moving quotes using structured logic.
+</h3>
+
+<p>
+Fill out the form to see how quickly your quote is delivered to your inbox — it’s generated in seconds with high accuracy based on your selected variables.</p>
+  <!-- ✅ FORM -->
+  <form id="quoteForm">
+
+    <div class="grid">
+
+      <div>
+        <label>Full Name</label>
+        <input type="text" name="name" required>
+      </div>
+
+      <div>
+        <label>Email</label>
+        <input type="email" name="email" required>
+      </div>
+
+      <div>
+        <label>Phone</label>
+        <input type="tel" name="phone" required>
+      </div>
+
+      <div>
+        <label>Move Type</label>
+        <select name="move_type" required>
+          <option value="">Select one...</option>
+          <option>Unload or Loading only</option>
+          <option>Complete move (Wrapping, Loading, Unloading, Assembling/Disassembling)</option>
+          <option>Furniture transportation</option>
+        </select>
+      </div>
+
+      <div>
+        <label>Move Size</label>
+        <select name="move_size" required>
+          <option value="">Select one...</option>
+          <option>1 or 2 pieces</option>
+          <option>1 Bedroom</option>
+          <option>2 Bedroom</option>
+          <option>3 Bedroom</option>
+          <option>4 Bedroom</option>
+          <option>5+ Bedroom</option>
+          <option>Office</option>
+        </select>
+      </div>
+
+      <div>
+        <label>Stairs (Flights)</label>
+        <input type="number" name="stairs" required>
+      </div>
+
+      <div class="full">
+        <label>Mattresses Details</label>
+        <textarea name="mattresses" required></textarea>
+      </div>
+
+      <div>
+        <label>Own Truck?</label>
+        <select name="truck" required>
+          <option value="">Select one...</option>
+          <option>Yes</option>
+          <option>No</option>
+        </select>
+      </div>
+
+      <div>
+        <label>Wrapping Needed?</label>
+        <select name="wrapping" required>
+          <option value="">Select one...</option>
+          <option>Yes</option>
+          <option>No</option>
+        </select>
+      </div>
+
+      <div>
+        <label>Heavy Items</label>
+        <select name="heavy_items">
+          <option value="">Select one...</option>
+          <option>Appliances</option>
+          <option>Exercise Equipment</option>
+          <option>Piano</option>
+          <option>Safe</option>
+          <option>Other</option>
+        </select>
+      </div>
+
+      <div class="full">
+        <label>Furniture Disassembly</label>
+        <textarea name="furniture_help"></textarea>
+      </div>
+
+      <div class="full">
+        <label>Starting Address</label>
+        <textarea name="start_address" required></textarea>
+      </div>
+
+      <div>
+        <label>Move Date</label>
+        <input type="date" name="date" required>
+      </div>
+
+      <div>
+        <label>Ending Address</label>
+        <textarea name="end_address" required></textarea>
+      </div>
+
+      <div>
+        <label>How did you find us?</label>
+        <select name="source" required>
+          <option value="">Select one...</option>
+          <option>Google</option>
+          <option>Social Media</option>
+          <option>Recommendation</option>
+          <option>Flyer</option>
+        </select>
+      </div>
+
+      <div class="full">
+        <label>Extra Info</label>
+        <textarea name="extra"></textarea>
+      </div>
+
+    </div>
+
+    <button type="submit">Send Quote</button>
+
+  </form>
+</div>
+
+<!-- ✅ WEBHOOK SCRIPT -->
+<script>
+document.getElementById("quoteForm").addEventListener("submit", async function(e) {
+  e.preventDefault();
+
+  const data = {
+    name: this.name.value,
+    email: this.email.value,
+    phone: this.phone.value,
+    move_type: this.move_type.value,
+    move_size: this.move_size.value,
+    stairs: this.stairs.value,
+    mattresses: this.mattresses.value,
+    truck: this.truck.value,
+    wrapping: this.wrapping.value,
+    heavy_items: this.heavy_items.value,
+    furniture_help: this.furniture_help.value,
+    start_address: this.start_address.value,
+    end_address: this.end_address.value,
+    date: this.date.value,
+    source: this.source.value,
+    extra: this.extra.value
+  };
+
+  try {
+    const res = await fetch("https://n8n.srv1058135.hstgr.cloud/webhook-test/quote-demo", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(data)
+    });
+
+    if (res.ok) {
+      alert("Quote sent successfully!");
+      this.reset();
+    } else {
+      alert("Something went wrong.");
+    }
+
+  } catch (err) {
+    alert("Network error.");
+    console.log(err);
+  }
+});
+</script>
+
+</body>
+</html>
