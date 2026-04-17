@@ -294,12 +294,32 @@ Fill out the form to see how quickly your quote is delivered to your inbox — i
 
     <button type="submit">Send Quote</button>
 
+    <div id="quoteResult" style="display:none; margin-top:30px;">
+
+<h2>Your Instant Quote</h2>
+
+<div class="section-box">
+
+<p><strong>Movers:</strong> <span id="movers"></span></p>
+<p><strong>Estimated Hours:</strong> <span id="hours"></span></p>
+<p><strong>Hourly Rate:</strong> $<span id="rate"></span></p>
+<p><strong>Labor:</strong> $<span id="labor"></span></p>
+<p><strong>Protection Plan:</strong> $<span id="protection"></span></p>
+
+<h3>Total Estimate: $<span id="total"></span></h3>
+
+<button id="bookMove">Book the Move</button>
+
+</div>
+
+</div>
   </form>
 </div>
 
 <!-- ✅ WEBHOOK SCRIPT -->
 <script>
 document.getElementById("quoteForm").addEventListener("submit", async function(e) {
+
   e.preventDefault();
 
   const data = {
@@ -322,6 +342,7 @@ document.getElementById("quoteForm").addEventListener("submit", async function(e
   };
 
   try {
+
     const res = await fetch("https://n8n.srv1058135.hstgr.cloud/webhook/quote-demo", {
       method: "POST",
       headers: {
@@ -330,17 +351,34 @@ document.getElementById("quoteForm").addEventListener("submit", async function(e
       body: JSON.stringify(data)
     });
 
-    if (res.ok) {
-      alert("Quote sent successfully!");
-      this.reset();
-    } else {
-      alert("Something went wrong.");
+    const result = await res.json();
+
+    const r = result[0];
+    
+    if (!res.ok) {
+      alert("Quote calculation failed");
+      return;
     }
 
-  } catch (err) {
-    alert("Network error.");
+    /* DISPLAY RESULTS */
+
+
+    document.getElementById("movers").innerText = r.movers;
+    document.getElementById("hours").innerText = r.hours;
+    document.getElementById("rate").innerText = r.rate;
+    document.getElementById("labor").innerText = r.labor;
+    document.getElementById("protection").innerText = r.protection;
+    document.getElementById("total").innerText = r.total;
+
+    document.getElementById("quoteResult").style.display = "block";
+
+  } catch(err) {
+
+    alert("Network error");
     console.log(err);
+
   }
+
 });
 </script>
 
