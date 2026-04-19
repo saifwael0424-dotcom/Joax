@@ -7,6 +7,64 @@
   <title>Joax live demo</title>
 
   <style>
+    /* OVERLAY */
+.overlay{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(15,23,42,0.6);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:1000;
+}
+
+/* HIDDEN STATE */
+.hidden{
+  display:none;
+}
+
+/* LOADER BOX */
+.loader-box{
+  background:white;
+  padding:30px;
+  border-radius:16px;
+  text-align:center;
+}
+
+/* SPINNER */
+.spinner{
+  width:40px;
+  height:40px;
+  border:4px solid #e2e8f0;
+  border-top:4px solid #0EA5E9;
+  border-radius:50%;
+  animation:spin 1s linear infinite;
+  margin:auto;
+  margin-bottom:10px;
+}
+
+@keyframes spin{
+  to{ transform:rotate(360deg); }
+}
+
+/* MODAL */
+.modal{
+  background:white;
+  padding:30px;
+  border-radius:16px;
+  max-width:400px;
+  width:90%;
+  text-align:center;
+  animation:fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn{
+  from{ opacity:0; transform:translateY(10px); }
+  to{ opacity:1; transform:translateY(0); }
+}
  :root{
   --bg:#F1F5F9;
   --panel:#FFFFFF;
@@ -159,6 +217,7 @@ button:hover{
   </style>
 </head>
 
+
 <body>
 
 <div class="container">
@@ -253,45 +312,20 @@ Fill out the form to see how quickly your quote is delivered to your inbox — i
 
 
 
-      <div class="full">
-        <label>Starting Address</label>
-        <textarea name="start_address" required></textarea>
-      </div>
 
       <div>
         <label>Move Date</label>
         <input type="date" name="date" required>
       </div>
 
-      <div>
-        <label>Ending Address</label>
-        <textarea name="end_address" required></textarea>
-      </div>
    
 
     </div>
 
     <button type="submit">Send Quote</button>
 
-    <div id="quoteResult" style="display:none; margin-top:30px;">
 
-<h2>Your Instant Quote</h2>
 
-<div class="section-box">
-
-<p><strong>Movers:</strong> <span id="movers"></span></p>
-<p><strong>Estimated Hours:</strong> <span id="hours"></span></p>
-<p><strong>Hourly Rate:</strong> $<span id="rate"></span></p>
-<p><strong>Labor:</strong> $<span id="labor"></span></p>
-<p><strong>Protection Plan:</strong> $<span id="protection"></span></p>
-
-<h3>Total Estimate: $<span id="total"></span></h3>
-
-<button id="bookMove">Book the Move</button>
-
-</div>
-
-</div>
   </form>
 </div>
 
@@ -308,17 +342,13 @@ document.getElementById("quoteForm").addEventListener("submit", async function(e
     move_type: this.move_type.value,
     move_size: this.move_size.value,
     stairs: this.stairs.value,
-    mattresses: this.mattresses.value,
     truck: this.truck.value,
-    wrapping: this.wrapping.value,
     heavy_items: this.heavy_items.value,
-    furniture_help: this.furniture_help.value,
-    start_address: this.start_address.value,
-    end_address: this.end_address.value,
     date: this.date.value,
-    source: this.source.value,
-    extra: this.extra.value
   };
+
+  // SHOW LOADING
+  document.getElementById("loadingOverlay").classList.remove("hidden");
 
   try {
 
@@ -331,17 +361,15 @@ document.getElementById("quoteForm").addEventListener("submit", async function(e
     });
 
     const result = await res.json();
-
+    console.log(result);
     const r = result[0];
-    
+
     if (!res.ok) {
       alert("Quote calculation failed");
       return;
     }
 
-    /* DISPLAY RESULTS */
-
-
+    // FILL DATA
     document.getElementById("movers").innerText = r.movers;
     document.getElementById("hours").innerText = r.hours;
     document.getElementById("rate").innerText = r.rate;
@@ -349,17 +377,53 @@ document.getElementById("quoteForm").addEventListener("submit", async function(e
     document.getElementById("protection").innerText = r.protection;
     document.getElementById("total").innerText = r.total;
 
-    document.getElementById("quoteResult").style.display = "block";
+    // HIDE LOADING
+    document.getElementById("loadingOverlay").classList.add("hidden");
+
+    // SHOW MODAL
+    document.getElementById("resultModal").classList.remove("hidden");
 
   } catch(err) {
 
+    document.getElementById("loadingOverlay").classList.add("hidden");
     alert("Network error");
     console.log(err);
 
   }
 
 });
+function closeModal(){
+  document.getElementById("resultModal").classList.add("hidden");
+}
 </script>
+<!-- LOADING OVERLAY -->
+<div id="loadingOverlay" class="overlay hidden">
+  <div class="loader-box">
+    <div class="spinner"></div>
+    <p>Calculating your quote...</p>
+  </div>
+</div>
 
+<!-- RESULT POPUP -->
+<div id="resultModal" class="overlay hidden">
+  <div class="modal">
+
+    <h2>Your Instant Quote</h2>
+
+    <div class="section-box">
+      <p><strong>Movers:</strong> <span id="movers"></span></p>
+      <p><strong>Estimated Hours:</strong> <span id="hours"></span></p>
+      <p><strong>Hourly Rate:</strong> $<span id="rate"></span></p>
+      <p><strong>Labor:</strong> $<span id="labor"></span></p>
+      <p><strong>Protection Plan:</strong> $<span id="protection"></span></p>
+
+      <h3>Total Estimate: $<span id="total"></span></h3>
+      <button>Book the Move</button>
+      <button>Call us</button>
+      <button onclick="closeModal()">Close</button>
+    </div>
+
+  </div>
+</div>
 </body>
 </html>
