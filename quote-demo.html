@@ -85,7 +85,7 @@ p{
 
 /* INPUTS */
 label{
-  font-size:13px;
+  font-size:12px;
   color:var(--muted);
   margin-bottom:6px;
   display:block;
@@ -109,13 +109,13 @@ input:focus, select:focus, textarea:focus{
 
 /* TEXTAREA */
 textarea{
-  min-height:90px;
+  min-height:50px;
   resize:vertical;
 }
 
 /* FULL WIDTH FIELD */
 .full{
-  grid-column: span 2;
+  grid-column: span 1;
 }
 
 /* BUTTON */
@@ -219,10 +219,7 @@ Fill out the form to see how quickly your quote is delivered to your inbox — i
         <input type="number" name="stairs" required>
       </div>
 
-      <div class="full">
-        <label>Mattresses Details</label>
-        <textarea name="mattresses" required></textarea>
-      </div>
+
 
       <div>
         <label>Own Truck?</label>
@@ -254,10 +251,7 @@ Fill out the form to see how quickly your quote is delivered to your inbox — i
         </select>
       </div>
 
-      <div class="full">
-        <label>Furniture Disassembly</label>
-        <textarea name="furniture_help"></textarea>
-      </div>
+
 
       <div class="full">
         <label>Starting Address</label>
@@ -273,22 +267,7 @@ Fill out the form to see how quickly your quote is delivered to your inbox — i
         <label>Ending Address</label>
         <textarea name="end_address" required></textarea>
       </div>
-
-      <div>
-        <label>How did you find us?</label>
-        <select name="source" required>
-          <option value="">Select one...</option>
-          <option>Google</option>
-          <option>Social Media</option>
-          <option>Recommendation</option>
-          <option>Flyer</option>
-        </select>
-      </div>
-
-      <div class="full">
-        <label>Extra Info</label>
-        <textarea name="extra"></textarea>
-      </div>
+   
 
     </div>
 
