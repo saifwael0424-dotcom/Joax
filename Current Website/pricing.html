@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pricing | Joax Automation</title>
+  <link rel="icon" type="image/png" href="Images/logo.png" />
+  <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet" />
+  <script src="https://assets.calendly.com/assets/external/widget.js" async></script>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ─── Design Tokens (matches main site palette) ─── */
+    :root {
+      --bg:        #F8FAFC;
+      --panel:     #FFFFFF;
+      --border:    #E2E8F0;
+      --text:      #0F172A;
+      --muted:     #475569;
+      --primary:   #0EA5E9;
+      --secondary: #6366F1;
+      --accent:    #22C55E;
+      --danger:    #EF4444;
+      --shadow:    0 10px 30px rgba(15,23,42,0.08);
+      --shadow-lg: 0 30px 60px rgba(15,23,42,0.12);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Sora', Arial, sans-serif;
+      background: #F1F5F9;
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    /* ─── Nav (matches main site exactly) ─── */
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 40px;
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(14px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      font-weight: 800;
+      font-size: 18px;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .nav-right { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+
+    .btn-nav {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 14px;
+      text-decoration: none;
+      box-shadow: var(--shadow);
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      transition: 0.25s ease;
+      display: inline-block;
+    }
+    .btn-nav:hover { transform: translateY(-2px); opacity: 0.95; }
+
+    .nav-plain {
+      margin-left: 14px;
+      text-decoration: none;
+      color: var(--muted);
+      font-weight: 500;
+      font-size: 14px;
+      transition: color 0.2s;
+    }
+    .nav-plain:hover { color: var(--text); }
+
+    /* ─── Hero ─── */
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 120px 20px 80px;
+      text-align: center;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      width: 800px; height: 800px;
+      background: radial-gradient(circle, rgba(14,165,233,0.10), transparent 70%);
+      top: -300px; right: -250px;
+      pointer-events: none;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(99,102,241,0.07), transparent 70%);
+      bottom: -200px; left: -180px;
+      pointer-events: none;
+    }
+
+    .hero-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 8px 18px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      box-shadow: var(--shadow);
+      margin-bottom: 28px;
+      animation: fadeUp 0.5s ease both;
+    }
+
+    .hero-pill .dot {
+      width: 8px; height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+      box-shadow: 0 0 6px var(--accent);
+      animation: blink 2s infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.35; }
+    }
+
+    .hero h1 {
+      font-size: clamp(42px, 6vw, 72px);
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -2px;
+      margin-bottom: 22px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: fadeUp 0.5s 0.08s ease both;
+    }
+
+    .hero p {
+      font-size: 19px;
+      color: var(--muted);
+      max-width: 580px;
+      margin: 0 auto 40px;
+      line-height: 1.75;
+      animation: fadeUp 0.5s 0.15s ease both;
+    }
+
+    /* ─── Trial CTA ─── */
+    .trial-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      animation: fadeUp 0.5s 0.22s ease both;
+      margin-bottom: 28px;
+    }
+
+    .btn-trial {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 38px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 16px;
+      font-family: inherit;
+      border-radius: 14px;
+      box-shadow: 0 8px 28px rgba(14,165,233,0.3);
+      border: none;
+      cursor: pointer;
+      transition: transform 0.25s, box-shadow 0.25s;
+    }
+    .btn-trial:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 14px 40px rgba(14,165,233,0.38);
+    }
+    .btn-trial svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+    .trial-note { font-size: 13px; color: var(--muted); font-weight: 500; }
+
+    /* ─── Trust Row ─── */
+    .trust-row {
+      display: flex;
+      justify-content: center;
+      gap: 28px;
+      flex-wrap: wrap;
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 600;
+      animation: fadeUp 0.5s 0.3s ease both;
+    }
+
+    /* ─── Cards Grid ─── */
+    .pricing-grid {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 20px 20px 80px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 28px;
+    }
+
+    /* ─── Card ─── */
+    .p-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 38px 32px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.25s, box-shadow 0.25s;
+      animation: fadeUp 0.5s 0.38s ease both;
+    }
+    .p-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); }
+
+    /* top accent bar */
+    .p-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      border-radius: 24px 24px 0 0;
+    }
+
+    .p-card.featured { border-color: rgba(99,102,241,0.25); animation-delay: 0.46s; }
+    .p-card.featured::before { background: linear-gradient(90deg, var(--secondary), #A78BFA); }
+
+    .p-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 13px;
+      border-radius: 999px;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+
+    .p-card h2 {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+    }
+
+    .p-sub {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+      margin-bottom: 28px;
+    }
+
+    .p-price {
+      display: flex;
+      align-items: flex-end;
+      gap: 2px;
+      margin-bottom: 28px;
+    }
+    .p-curr { font-size: 22px; font-weight: 700; color: var(--muted); margin-bottom: 8px; }
+    .p-amt  { font-size: 58px; font-weight: 800; letter-spacing: -3px; line-height: 1; color: var(--text); }
+    .p-per  { font-size: 14px; color: var(--muted); margin-bottom: 10px; margin-left: 4px; }
+
+    .p-divider { height: 1px; background: var(--border); margin-bottom: 24px; }
+
+    .p-features {
+      list-style: none;
+      margin-bottom: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 13px;
+    }
+    .p-features li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .ck {
+      width: 22px; height: 22px;
+      flex-shrink: 0;
+      background: rgba(34,197,94,0.10);
+      border: 1px solid rgba(34,197,94,0.2);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin-top: 1px;
+    }
+    .ck svg { width: 11px; height: 11px; stroke: var(--accent); }
+
+    .btn-card {
+      display: block;
+      width: 100%;
+      text-align: center;
+      padding: 15px;
+      border-radius: 12px;
+      font-family: inherit;
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+      border: none;
+      transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+    }
+    .btn-card.outline {
+      border: 1.5px solid var(--border);
+      background: #F8FAFC;
+      color: var(--text);
+    }
+    .btn-card.outline:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      transform: translateY(-1px);
+    }
+    .btn-card.fill {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      box-shadow: 0 6px 20px rgba(99,102,241,0.25);
+    }
+    .btn-card.fill:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(99,102,241,0.35);
+    }
+
+    /* ─── Bottom CTA ─── */
+    .cta-wrap {
+      max-width: 780px;
+      margin: 0 auto 100px;
+      padding: 0 20px;
+      animation: fadeUp 0.5s 0.55s ease both;
+    }
+
+    .cta-box {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      padding: 62px 52px;
+      text-align: center;
+      box-shadow: var(--shadow-lg);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-box::before {
+      content: '';
+      position: absolute;
+      width: 450px; height: 450px;
+      background: radial-gradient(circle, rgba(14,165,233,0.07), transparent 70%);
+      top: -180px; left: -120px;
+      pointer-events: none;
+    }
+
+    .cta-box::after {
+      content: '';
+      position: absolute;
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(99,102,241,0.07), transparent 70%);
+      bottom: -160px; right: -100px;
+      pointer-events: none;
+    }
+
+    .cta-box h2 {
+      font-size: 34px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 14px;
+      line-height: 1.2;
+    }
+
+    .cta-box p {
+      color: var(--muted);
+      font-size: 17px;
+      margin-bottom: 36px;
+      line-height: 1.7;
+      max-width: 480px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* ─── Footer ─── */
+    footer {
+      margin-top: 0;
+      padding: 40px 20px;
+      background: white;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      color: var(--muted);
+    }
+    footer h3 { color: var(--text); margin-bottom: 15px; font-size: 18px; font-weight: 700; }
+    footer a  { text-decoration: none; color: var(--muted); font-weight: 500; }
+    footer p  { margin-bottom: 20px; font-size: 15px; }
+
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 18px;
+      margin-bottom: 20px;
+    }
+
+    /* ─── Animations ─── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(22px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─── Responsive ─── */
+    @media (max-width: 768px) {
+      nav { padding: 14px 20px; flex-direction: column; gap: 10px; }
+      .nav-right { justify-content: center; }
+      .hero { padding: 80px 20px 50px; }
+      .cta-box { padding: 38px 24px; }
+      .cta-box h2 { font-size: 26px; }
+      .btn-trial { padding: 14px 28px; font-size: 15px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ─── Nav ─── -->
+  <nav>
+    <a class="nav-logo" href="index.html">Joax</a>
+    <div class="nav-right">
+      <button class="btn-nav"
+        onclick="Calendly.initPopupWidget({url:'https://calendly.com/joax_automation'}); return false;">
+        Book a Free Call
+      </button>
+      <a class="btn-nav" href="index.html#cta">Get your free demo</a>
+      <a class="btn-nav" href="pricing.html">Pricing</a>
+      <a class="nav-plain" href="https://instagram.com/Joax_automation" target="_blank" rel="noopener"
+         style="display:inline-flex; align-items:center; margin-left:10px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+          <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+          <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+        </svg>
+      </a>
+    </div>
+  </nav>
+
+  <!-- ─── Hero ─── -->
+  <section class="hero">
+    <div class="hero-pill">
+      <span class="dot"></span>
+      Simple, transparent pricing
+    </div>
+
+    <h1>Plans Built to Get<br>You More Bookings</h1>
+
+    <p>
+      Embed instant quotes and booking actions directly into your moving company website.
+      Pick the plan that fits your business today.
+    </p>
+
+    <div class="trial-wrap">
+      <button class="btn-trial"
+        onclick="Calendly.initPopupWidget({url:'https://calendly.com/joax_automation'}); return false;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+             stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="18" rx="2"/>
+          <line x1="16" y1="2" x2="16" y2="6"/>
+          <line x1="8" y1="2" x2="8" y2="6"/>
+          <line x1="3" y1="10" x2="21" y2="10"/>
+        </svg>
+        Get a Trial
+      </button>
+      <span class="trial-note">Book a free 15-min call · No credit card required</span>
+    </div>
+
+    <div class="trust-row">
+      <span>✔ Installed in under 10 minutes</span>
+      <span>✔ Mobile optimized</span>
+      <span>✔ No CRM required</span>
+    </div>
+  </section>
+
+  <!-- ─── Pricing Cards ─── -->
+  <div class="pricing-grid">
+
+    <!-- Starter -->
+    <div class="p-card">
+      <div class="p-badge">Starter</div>
+      <h2>Instant Quote System</h2>
+      <p class="p-sub">Capture leads 24/7 with a smart calculator that delivers quotes instantly — no manual work needed.</p>
+
+      <div class="p-price">
+        <span class="p-curr">$</span>
+        <span class="p-amt">199</span>
+        <span class="p-per">/month</span>
+      </div>
+
+      <div class="p-divider"></div>
+
+      <ul class="p-features">
+        <li><span class="ck"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg></span>Instant quote calculator on your site</li>
+        <li><span class="ck"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg></span>Automated quote delivery by email</li>
+        <li><span class="ck"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg></span>Lead capture system</li>
+        <li><span class="ck"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg></span>Fully mobile optimized</li>
+      </ul>
+
+      <button class="btn-card outline"
+        onclick="Calendly.initPopupWidget({url:'https://calendly.com/joax_automation'}); return false;">
+        Get a Trial →
+      </button>
+    </div>
+
+    <!-- Featured -->
+    <div class="p-card featured">
+      <div class="p-badge">Most Popular</div>
+      <h2>Booking System</h2>
+      <p class="p-sub">Turn quotes into confirmed moves with a full conversion system built to maximize revenue.</p>
+
+      <div class="p-price">
+        <span class="p-curr">$</span>
+        <span class="p-amt">299</span>
+        <span class="p-per">/month</span>
+      </div>
+
+      <div class="p-divider"></div>
+
+      <ul class="p-features">
+        <li><span class="ck"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg></span>Everything in the Starter plan</li>
+        <li><span class="ck"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg></span>"Book The Move" one-click button</li>
+        <li><span class="ck"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg></span>Direct "Call Us" integration</li>
+        <li><span class="ck"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg></span>Higher conversion system</li>
+      </ul>
+
+      <button class="btn-card fill"
+        onclick="Calendly.initPopupWidget({url:'https://calendly.com/joax_automation'}); return false;">
+        Get a Trial →
+      </button>
+    </div>
+
+  </div>
+
+  <!-- ─── Bottom CTA Banner ─── -->
+  <div class="cta-wrap">
+    <div class="cta-box">
+      <h2>Not sure which plan is right for you?</h2>
+      <p>Book a free 15-minute call and we'll walk through your setup and find the right fit for your moving company.</p>
+      <button class="btn-trial"
+        onclick="Calendly.initPopupWidget({url:'https://calendly.com/joax_automation'}); return false;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+             stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px">
+          <rect x="3" y="4" width="18" height="18" rx="2"/>
+          <line x1="16" y1="2" x2="16" y2="6"/>
+          <line x1="8" y1="2" x2="8" y2="6"/>
+          <line x1="3" y1="10" x2="21" y2="10"/>
+        </svg>
+        Get a Trial
+      </button>
+    </div>
+  </div>
+
+  <!-- ─── Sticky CTA (matches main site) ─── -->
+  <div style="position:fixed; bottom:20px; right:20px; z-index:50;">
+    <button class="btn-nav"
+      onclick="Calendly.initPopupWidget({url:'https://calendly.com/joax_automation'}); return false;">
+      Book a Free Call
+    </button>
+  </div>
+
+  <!-- ─── Footer ─── -->
+  <footer>
+    <div style="max-width:1100px; margin:auto;">
+      <h3>Joax Automation</h3>
+      <p>Automated quote system for moving companies.</p>
+      <div class="footer-links">
+        <a href="/pricing.html">Pricing</a>
+        <a href="/terms.html">Terms &amp; Conditions</a>
+        <a href="/privacy.html">Privacy Policy</a>
+        <a href="/refund.html">Refund Policy</a>
+      </div>
+      <p style="font-size:14px;">
+        Contact: <a href="mailto:saifwael0424@gmail.com" style="color:var(--primary);">saifwael0424@gmail.com</a>
+      </p>
+      <p style="font-size:12px; margin-top:10px;">© 2026 Joax Automation. All rights reserved.</p>
+    </div>
+  </footer>
+
+</body>
+</html>
