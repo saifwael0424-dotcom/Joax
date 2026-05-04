@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/png" href="logo.png" />
+  <title>Joax — Live Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ─── Tokens ─── */
+ :root {
+      --bg:        #F1F5F9;
+      --panel:     #FFFFFF;
+      --border:    #E2E8F0;
+      --text:      #0F172A;
+      --muted:     #64748B;
+      --primary:   #0EA5E9;
+      --secondary: #6366F1;
+      --accent:    #22C55E;
+      --shadow-sm: 0 1px 3px rgba(15,23,42,0.08);
+      --shadow:    0 10px 30px rgba(15,23,42,0.10);
+      --shadow-lg: 0 30px 60px rgba(15,23,42,0.14);
+      --radius:    16px;
+      --grad:      linear-gradient(135deg, var(--primary), var(--secondary));
+    }
+    /* ─── Reset ─── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 50px 16px 80px;
+    }
+
+    /* ─── Header ─── */
+    .header {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+
+    .header .badge {
+      display: inline-block;
+      padding: 6px 14px;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 16px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .header h1 {
+      font-size: 42px;
+      font-weight: 700;
+      letter-spacing: -1px;
+      line-height: 1.1;
+      background: var(--grad);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 12px;
+    }
+
+    .header p {
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.6;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    /* ─── Card ─── */
+    .card {
+      width: 100%;
+      max-width: 560px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 36px;
+      box-shadow: var(--shadow);
+    }
+
+    /* ─── Form section labels ─── */
+    .form-section {
+      margin-bottom: 24px;
+    }
+
+    .form-section-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* ─── Grid ─── */
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .span-2 { grid-column: span 2; }
+
+    /* ─── Fields ─── */
+    .field { display: flex; flex-direction: column; gap: 5px; }
+
+    label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+    }
+
+    input, select {
+      width: 100%;
+      padding: 11px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #F8FAFC;
+      font-family: inherit;
+      font-size: 14px;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    /* Custom select arrow */
+    .select-wrap { position: relative; }
+    .select-wrap::after {
+      content: "▾";
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(14,165,233,0.15);
+      background: white;
+    }
+
+    /* ─── Submit Button ─── */
+    .btn-submit {
+      width: 100%;
+      padding: 15px;
+      margin-top: 8px;
+      border: none;
+      border-radius: 14px;
+      background: var(--grad);
+      color: white;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(14,165,233,0.35);
+      transition: transform 0.2s, opacity 0.2s;
+      letter-spacing: 0.2px;
+    }
+
+    .btn-submit:hover { transform: translateY(-2px); opacity: 0.95; }
+    .btn-submit:active { transform: translateY(0); }
+
+    /* ─── Loading Overlay ─── */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15,23,42,0.55);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      backdrop-filter: blur(4px);
+    }
+
+    .hidden { display: none !important; }
+
+    .loader-box {
+      background: white;
+      padding: 36px 48px;
+      border-radius: 20px;
+      text-align: center;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .spinner {
+      width: 44px;
+      height: 44px;
+      border: 4px solid #E2E8F0;
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 16px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .loader-box p {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--muted);
+    }
+
+    /* ─── Result Modal ─── */
+    .modal {
+      background: white;
+      border-radius: 24px;
+      max-width: 440px;
+      width: 90%;
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+      animation: popIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    }
+
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.92) translateY(12px); }
+      to   { opacity: 1; transform: scale(1)    translateY(0); }
+    }
+
+    /* Modal gradient header */
+    .modal-header {
+      background: var(--grad);
+      padding: 28px 28px 24px;
+      text-align: center;
+      color: white;
+    }
+
+    .modal-header .check {
+      width: 52px;
+      height: 52px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 14px;
+      font-size: 22px;
+    }
+
+    .modal-header h2 {
+      font-size: 22px;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 4px;
+    }
+
+    .modal-header p {
+      font-size: 14px;
+      color: rgba(255,255,255,0.8);
+    }
+
+    /* Modal body */
+    .modal-body { padding: 24px 28px; }
+
+    .result-rows { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
+
+   .result-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.row-label {
+  flex: 1;
+  min-width: 0;
+}
+
+.row-value {
+  flex-shrink: 0;
+  text-align: right;
+  white-space: nowrap;
+}
+   .result-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 14px;
+    background: var(--text);
+    border-radius: 12px;
+    margin-bottom: 22px;
+  }
+
+    .result-total .label {
+   font-size: 14px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.7);
+  }
+
+    .result-total .value {
+    font-size: 26px;
+    font-weight: 700;
+    color: white;
+  }
+
+    /* Modal action buttons */
+    .modal-actions { display: flex; flex-direction: column; gap: 10px; }
+
+    .btn-book {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      background: var(--grad);
+      color: white;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(14,165,233,0.3);
+      transition: transform 0.2s, opacity 0.2s;
+    }
+
+    .btn-book:hover { transform: translateY(-2px); opacity: 0.95; }
+
+    .btn-call {
+      width: 100%;
+      padding: 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      background: white;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .btn-call:hover { border-color: var(--primary); background: #F0F9FF; }
+
+    .btn-close {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 12px;
+      background: transparent;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+
+    .btn-close:hover { color: var(--text); }
+
+    /* ─── Responsive ─── */
+    @media (max-width: 560px) {
+      body { padding: 30px 12px 60px; }
+      .header h1 { font-size: 32px; }
+      .card { padding: 24px 20px; }
+      .grid { grid-template-columns: 1fr; }
+      .span-2 { grid-column: span 1; }
+      .modal-body { padding: 20px; }
+      .modal-header { padding: 24px 20px 20px; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ─── Header ─── -->
+  <div class="header">
+    <div class="badge">🎯 Live Demo System</div>
+    <h1> Alaska Juneau Moving (Instant Quote Demo)</h1>
+    <p>Fill out the form below and get an instant quote</p>
+  </div>
+
+  <!-- ─── Form Card ─── -->
+  <div class="card">
+    <form id="quoteForm">
+
+      <!-- Contact Info -->
+      <div class="form-section">
+        <div class="form-section-title">Contact Info</div>
+        <div class="grid">
+          <div class="field">
+            <label>Full Name</label>
+            <input type="text" name="name" placeholder="John Smith" required />
+          </div>
+          <div class="field">
+            <label>Email</label>
+            <input type="email" name="email" placeholder="you@email.com" required />
+          </div>
+          <div class="field span-2">
+            <label>Phone</label>
+            <input type="tel" name="phone" placeholder="+1 (555) 000-0000" required />
+          </div>
+        </div>
+      </div>
+
+      <!-- Move Details -->
+      <div class="form-section">
+        <div class="form-section-title">Move Details</div>
+        <div class="grid">
+          <div class="field span-2">
+            <label>Move Type</label>
+            <div class="select-wrap">
+              <select name="move_type" required>
+                <option value="">Select one…</option>
+                <option>Unload or Loading only</option>
+                <option>Complete move (Wrapping, Loading, Unloading, Assembling/Disassembling)</option>
+                <option>Furniture transportation</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label>Move Size</label>
+            <div class="select-wrap">
+              <select name="move_size" required>
+                <option value="">Select one…</option>
+                <option>1 or 2 pieces</option>
+                <option>1 Bedroom</option>
+                <option>2 Bedroom</option>
+                <option>3 Bedroom</option>
+                <option>4 Bedroom</option>
+                <option>5+ Bedroom</option>
+                <option>Office</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label>Stairs (Flights)</label>
+            <input type="number" name="stairs" placeholder="0" min="0" required />
+          </div>
+          <div class="field">
+            <label>Own Truck?</label>
+            <div class="select-wrap">
+              <select name="truck" required>
+                <option value="">Select one…</option>
+                <option>Yes</option>
+                <option>No</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label>Wrapping Needed?</label>
+            <div class="select-wrap">
+              <select name="wrapping" required>
+                <option value="">Select one…</option>
+                <option>Yes</option>
+                <option>No</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label>Heavy Items</label>
+            <div class="select-wrap">
+              <select name="heavy_items">
+                <option value="">None</option>
+                <option>Appliances</option>
+                <option>Exercise Equipment</option>
+                <option>Piano</option>
+                <option>Safe</option>
+                <option>Other</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label>Move Date</label>
+            <input type="date" name="date" required />
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-submit">Calculate My Quote →</button>
+
+    </form>
+  </div>
+
+  <!-- ─── Loading Overlay ─── -->
+  <div id="loadingOverlay" class="overlay hidden">
+    <div class="loader-box">
+      <div class="spinner"></div>
+      <p>Calculating your quote…</p>
+    </div>
+  </div>
+
+  <!-- ─── Result Modal ─── -->
+  <div id="resultModal" class="overlay hidden">
+    <div class="modal">
+
+      <div class="modal-header">
+        <div class="check">✓</div>
+        <h2>Your Instant Quote</h2>
+        <p>Based on your move details</p>
+      </div>
+
+      <div class="modal-body">
+        <div class="result-rows">
+          <div class="result-row">
+            <span class="row-label">👷 Movers</span>
+            <span class="row-value" id="movers">—</span>
+          </div>
+          <div class="result-row">
+            <span class="row-label">⏱ Estimated Hours</span>
+            <span class="row-value" id="hours">—</span>
+          </div>
+          <div class="result-row">
+            <span class="row-label">💵 Hourly Rate</span>
+            <span class="row-value">$<span id="rate">—</span></span>
+          </div>
+          <div class="result-row">
+            <span class="row-label">🔧 Labor</span>
+            <span class="row-value">$<span id="labor">—</span></span>
+          </div>
+          <div class="result-row">
+            <span class="row-label">🛡 Protection Plan</span>
+            <span class="row-value">$<span id="protection">—</span></span>
+          </div>
+        </div>
+
+        <div class="result-total">
+          <span class="label">Total Estimate</span>
+          <span class="value">$<span id="low"></span> – $<span id="high"></span></span>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn-book">📅 Book the Move</button>
+          <button class="btn-call">📞 Call Us</button>
+          <button class="btn-close" onclick="closeModal()">Close</button>
+        </div>
+        <div class="finished">
+        <button class="finished" onclick="window.open('https://calendly.com/joax_automation', '_blank')">
+         Interested in this system?
+        </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ─── Script ─── -->
+  <script>
+    document.getElementById("quoteForm").addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const data = {
+        name:        this.name.value,
+        email:       this.email.value,
+        phone:       this.phone.value,
+        move_type:   this.move_type.value,
+        move_size:   this.move_size.value,
+        stairs:      this.stairs.value,
+        truck:       this.truck.value,
+        wrapping:    this.wrapping.value,
+        heavy_items: this.heavy_items.value,
+        date:        this.date.value,
+      };
+
+      document.getElementById("loadingOverlay").classList.remove("hidden");
+
+      try {
+        const res = await fetch("https://n8n.srv1058135.hstgr.cloud/webhook/quote-demo", {
+          method:  "POST",
+          headers: { "Content-Type": "application/json" },
+          body:    JSON.stringify(data),
+        });
+
+        if (!res.ok) throw new Error("Quote calculation failed");
+
+        const result = await res.json();
+        const r = result[0];
+
+        document.getElementById("movers").innerText     = r.movers;
+        document.getElementById("hours").innerText      = r.hours;
+        document.getElementById("rate").innerText       = r.rate;
+        document.getElementById("labor").innerText      = r.labor;
+        document.getElementById("protection").innerText = r.protection;
+        document.getElementById("low").innerText        = r.low;
+        document.getElementById("high").innerText       = r.high;
+
+
+        document.getElementById("loadingOverlay").classList.add("hidden");
+        document.getElementById("resultModal").classList.remove("hidden");
+
+      } catch (err) {
+        document.getElementById("loadingOverlay").classList.add("hidden");
+        alert("Something went wrong. Please try again.");
+        console.error(err);
+      }
+    });
+
+    function closeModal() {
+      document.getElementById("resultModal").classList.add("hidden");
+    }
+  </script>
+
+</body>
+</html>
