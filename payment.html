@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Joax – Subscribe</title>
+  <link rel="icon" type="image/png" href="Images/logo.png" />
+  <link rel="apple-touch-icon" href="Images/finallogo.png" />
+
+  <style>
+    /* ─── Design Tokens (identical to index.html) ─── */
+    :root {
+      --bg:        #F8FAFC;
+      --panel:     #FFFFFF;
+      --card:      #FFFFFF;
+      --border:    #E2E8F0;
+      --text:      #0F172A;
+      --muted:     #475569;
+      --primary:   #0EA5E9;
+      --secondary: #6366F1;
+      --accent:    #22C55E;
+      --danger:    #EF4444;
+      --shadow:    0 10px 30px rgba(15,23,42,0.08);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #F1F5F9;
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    /* ─── Navigation ─── */
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 40px;
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(14px);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      border-bottom: 1px solid var(--border);
+    }
+
+    nav a {
+      margin-left: 18px;
+      text-decoration: none;
+      color: var(--muted);
+      font-weight: 500;
+    }
+    nav a:hover { color: var(--text); }
+
+    .btn-nav {
+      margin-left: 12px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 14px;
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+
+    /* ─── Page Layout ─── */
+    .page-wrap {
+      min-height: calc(100vh - 70px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 20px;
+    }
+
+    /* ─── Payment Card ─── */
+    .payment-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      box-shadow: 0 30px 60px rgba(15,23,42,0.12);
+      max-width: 960px;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      overflow: hidden;
+    }
+
+    /* ─── Left Panel ─── */
+    .left-panel {
+      background: linear-gradient(150deg, var(--primary), var(--secondary));
+      padding: 50px 40px;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .left-panel .brand {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 40px;
+    }
+
+    .left-panel h2 {
+      font-size: 36px;
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -1px;
+      margin: 0 0 16px;
+    }
+
+    .left-panel p {
+      font-size: 16px;
+      opacity: 0.85;
+      line-height: 1.7;
+      margin: 0 0 36px;
+    }
+
+    .price-tag {
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 16px;
+      padding: 22px 26px;
+      margin-bottom: 36px;
+    }
+
+    .price-tag .amount {
+      font-size: 52px;
+      font-weight: 800;
+      letter-spacing: -2px;
+      line-height: 1;
+    }
+
+    .price-tag .period {
+      font-size: 16px;
+      opacity: 0.75;
+      margin-top: 4px;
+    }
+
+    .feature-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .feature-list li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: white;
+      opacity: 0.95;
+    }
+
+    .feature-list li::before {
+      content: "✓";
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      background: rgba(255,255,255,0.25);
+      border-radius: 50%;
+      font-size: 12px;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    /* ─── Right Panel ─── */
+    .right-panel {
+      padding: 50px 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .right-panel h3 {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin: 0 0 8px;
+    }
+
+    .right-panel .subtitle {
+      color: var(--muted);
+      font-size: 15px;
+      margin: 0 0 32px;
+    }
+
+    /* ─── Trust Badges ─── */
+    .trust-badges {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+    }
+
+    .badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: #F8FAFC;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+    }
+
+    /* ─── Divider ─── */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 28px 0;
+    }
+
+    /* ─── PayPal container ─── */
+    #paypal-button-container-P-19481972G4018233YNH6RLIQ {
+      width: 100%;
+    }
+
+    /* ─── Fine print ─── */
+    .fine-print {
+      margin-top: 18px;
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.6;
+    }
+
+    .fine-print a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    /* ─── Footer ─── */
+    footer {
+      padding: 28px 20px;
+      background: white;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    footer a {
+      color: var(--muted);
+      text-decoration: none;
+      margin: 0 10px;
+    }
+
+    footer a:hover { color: var(--text); }
+
+    /* ─── Responsive ─── */
+    @media (max-width: 768px) {
+      nav {
+        flex-direction: column;
+        align-items: center;
+        padding: 14px 20px;
+        gap: 10px;
+      }
+
+      .payment-card {
+        grid-template-columns: 1fr;
+      }
+
+      .left-panel {
+        padding: 36px 28px;
+      }
+
+      .left-panel h2 { font-size: 28px; }
+      .price-tag .amount { font-size: 40px; }
+
+      .right-panel {
+        padding: 36px 28px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ─── Navigation ─── -->
+  <nav>
+    <div><b>Joax</b></div>
+    <div>
+      <a class="btn-nav" href="index.html">← Back to Home</a>
+      <a class="btn-nav" href="pricing.html">Pricing</a>
+    </div>
+  </nav>
+
+  <!-- ─── Main Content ─── -->
+  <div class="page-wrap">
+    <div class="payment-card">
+
+      <!-- Left: Plan Details -->
+      <div class="left-panel">
+        <div class="brand">Joax</div>
+
+        <div>
+          <h2>Start Turning Visitors Into Booked Moves</h2>
+          <p>Get the full Joax quote automation system embedded on your website — instant quotes, lead capture, and booking actions.</p>
+
+          <div class="price-tag">
+            <div class="amount">$97</div>
+            <div class="period">per month · cancel anytime</div>
+          </div>
+
+          <ul class="feature-list">
+            <li>Instant quote calculator on your site</li>
+            <li>Custom pricing logic for your business</li>
+            <li>Lead capture & email notifications</li>
+            <li>Call & booking buttons built in</li>
+            <li>Mobile optimized & fast</li>
+            <li>Installed in under 10 minutes</li>
+            <li>Dedicated setup support</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Right: Payment -->
+      <div class="right-panel">
+        <h3>Complete Your Subscription</h3>
+        <p class="subtitle">Secure checkout powered by PayPal. No credit card stored on our servers.</p>
+
+        <div class="trust-badges">
+          <span class="badge">🔒 Secure Checkout</span>
+          <span class="badge">✅ Cancel Anytime</span>
+          <span class="badge">⚡ Instant Access</span>
+        </div>
+
+        <hr class="divider" />
+
+        <!-- PayPal Button -->
+        <div id="paypal-button-container-P-19481972G4018233YNH6RLIQ"></div>
+
+        <p class="fine-print">
+          By subscribing you agree to our
+          <a href="terms.html">Terms &amp; Conditions</a> and
+          <a href="refund.html">Refund Policy</a>.<br>
+          Your subscription renews monthly. Cancel at any time from your PayPal account.
+        </p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ─── Footer ─── -->
+  <footer>
+    <p>
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="terms.html">Terms &amp; Conditions</a>
+      <a href="refund.html">Refund Policy</a>
+      <a href="mailto:saifwael0424@gmail.com">Contact</a>
+    </p>
+    <p style="margin-top:8px;">© 2026 Joax Automation. All rights reserved.</p>
+  </footer>
+
+  <!-- ─── PayPal SDK ─── -->
+  <script src="https://www.paypal.com/sdk/js?client-id=BAAs7lOIGpkzv4P94hu5orus8LbFXYhnTOxNF9srVOA-K82E85Uh-hwjYB1O-c1rHFmadV5j9zUCtyIwiE&vault=true&intent=subscription" data-sdk-integration-source="button-factory"></script>
+  <script>
+    paypal.Buttons({
+      style: {
+        shape: 'pill',
+        color: 'blue',
+        layout: 'vertical',
+        label: 'paypal'
+      },
+      createSubscription: function(data, actions) {
+        return actions.subscription.create({
+          plan_id: 'P-19481972G4018233YNH6RLIQ'
+        });
+      },
+      onApprove: function(data, actions) {
+        alert('🎉 Subscription activated! ID: ' + data.subscriptionID);
+      }
+    }).render('#paypal-button-container-P-19481972G4018233YNH6RLIQ');
+  </script>
+
+</body>
+</html>
