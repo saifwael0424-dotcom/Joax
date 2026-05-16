@@ -348,17 +348,8 @@ tr:hover td{background:#fafafa}
       style="flex:1;min-width:200px;padding:8px 12px;font-size:13px;border:1px solid #ddd;border-radius:8px">
     <span style="font-size:13px;color:#888" id="leads-count"></span>
     </div>
-
   
   
-
-  <div class="save-bar">
-    <span class="save-status" id="save-status">No unsaved changes</span>
-    <div class="btn-row">
-      <button class="btn-ghost" onclick="loadConfig()">Discard</button>
-      <button class="btn-save" onclick="saveConfig()">Save config</button>
-    </div>
-  </div>
    <div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap">
     <button class="status-filter tab active" onclick="filterLeadStatus('all')">All</button>
     <button class="status-filter tab" onclick="filterLeadStatus('new')">🔵 New</button>
@@ -437,7 +428,13 @@ tr:hover td{background:#fafafa}
     </div>
   </div>
 </div>
- 
+
+<div class="save-bar">
+    <span class="save-status" id="save-status">No unsaved changes</span>
+    <div class="btn-row">
+      <button class="btn-ghost" onclick="loadConfig()">Discard</button>
+      <button class="btn-save" onclick="saveConfig()">Save config</button>
+    </div>
 
 <script>
 const SUPABASE_URL = 'https://izppuvmdowgctlligvfi.supabase.co';
