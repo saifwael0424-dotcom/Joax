@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Joax Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  .status-filter.active{background:#534AB7;color:#fff;border-color:#534AB7}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;background:#f5f5f5;color:#111}
+.hidden{display:none!important}
+
+/* Auth */
+.auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center}
+.auth-card{background:#fff;border:1px solid #e5e5e5;border-radius:12px;padding:2rem;width:100%;max-width:380px}
+.auth-logo{font-size:20px;font-weight:600;margin-bottom:1.5rem;text-align:center}
+.auth-logo span{color:#534AB7}
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-size:13px;color:#555;margin-bottom:5px}
+.form-group input{width:100%;padding:9px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px}
+.form-group input:focus{outline:none;border-color:#534AB7;box-shadow:0 0 0 3px #EEEDFE}
+.btn-primary{width:100%;padding:10px;background:#534AB7;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer}
+.btn-primary:hover{background:#3C3489}
+.auth-error{color:#E24B4A;font-size:13px;margin-top:10px;text-align:center}
+
+/* Layout */
+.app{display:flex;min-height:100vh}
+.sidebar{width:210px;background:#fff;border-right:1px solid #e5e5e5;padding:1rem;display:flex;flex-direction:column;gap:2px;flex-shrink:0;position:fixed;top:0;left:0;height:100vh;overflow-y:auto}
+.sidebar-logo{font-size:16px;font-weight:600;padding:8px 10px 16px;border-bottom:1px solid #e5e5e5;margin-bottom:8px}
+.sidebar-logo span{color:#534AB7}
+.nav-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;cursor:pointer;font-size:14px;color:#666;border:none;background:none;width:100%;text-align:left}
+.nav-item:hover{background:#f5f5f5;color:#111}
+.nav-item.active{background:#EEEDFE;color:#534AB7;font-weight:500}
+.nav-section{font-size:11px;color:#aaa;padding:12px 10px 4px;text-transform:uppercase;letter-spacing:0.05em}
+.main{flex:1;margin-left:210px;padding:24px;max-width:900px}
+.page{display:none}
+.page.active{display:block}
+.page-title{font-size:20px;font-weight:600;margin-bottom:4px}
+.page-sub{font-size:13px;color:#666;margin-bottom:24px}
+
+/* Cards */
+.card{background:#fff;border:1px solid #e5e5e5;border-radius:12px;padding:1.25rem;margin-bottom:16px}
+.card-title{font-size:14px;font-weight:600;margin-bottom:4px}
+.card-sub{font-size:12px;color:#888;margin-bottom:14px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+
+/* Field rows */
+.field-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid #f0f0f0}
+.field-row:last-child{border-bottom:none}
+.field-label{font-size:13px;color:#333}
+.field-sub{font-size:11px;color:#aaa}
+.field-input{display:flex;align-items:center;gap:5px;font-size:13px;color:#888}
+.field-input input{width:80px;padding:5px 8px;font-size:13px;border:1px solid #ddd;border-radius:6px;text-align:right}
+.field-input input:focus{outline:none;border-color:#534AB7}
+
+/* Toggle */
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid #f0f0f0}
+.toggle-row:last-child{border-bottom:none}
+.toggle{position:relative;width:36px;height:20px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0}
+.slider{position:absolute;cursor:pointer;inset:0;background:#ddd;border-radius:20px;transition:.2s}
+.slider:before{position:absolute;content:"";height:14px;width:14px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.2s}
+input:checked+.slider{background:#534AB7}
+input:checked+.slider:before{transform:translateX(16px)}
+
+/* Tabs */
+.tabs{display:flex;gap:4px;background:#f5f5f5;padding:3px;border-radius:8px;margin-bottom:16px;flex-wrap:wrap}
+.tab{padding:6px 14px;border-radius:6px;font-size:13px;cursor:pointer;color:#666;border:none;background:none}
+.tab.active{background:#fff;color:#111;font-weight:500;box-shadow:0 1px 3px rgba(0,0,0,0.08)}
+
+/* Custom items */
+.custom-item{display:flex;align-items:center;gap:8px;padding:8px;background:#f9f9f9;border-radius:8px;margin-bottom:6px}
+.custom-item input[type=text]{flex:1;padding:5px 8px;font-size:13px;border:1px solid #ddd;border-radius:6px}
+.del-btn{background:none;border:none;cursor:pointer;color:#bbb;padding:4px;border-radius:4px;font-size:16px;line-height:1}
+.del-btn:hover{color:#E24B4A;background:#FCEBEB}
+.add-btn{display:flex;align-items:center;gap:6px;padding:7px 12px;border:1px dashed #ccc;border-radius:8px;background:none;cursor:pointer;font-size:13px;color:#888;width:100%;margin-top:6px}
+.add-btn:hover{background:#f5f5f5}
+
+/* Discount codes */
+.code-item{display:flex;align-items:center;gap:8px;padding:8px;background:#f9f9f9;border-radius:8px;margin-bottom:6px}
+.code-item input[type=text]{width:100px;padding:5px 8px;font-size:13px;border:1px solid #ddd;border-radius:6px}
+.code-item select{padding:5px 8px;font-size:13px;border:1px solid #ddd;border-radius:6px;background:#fff}
+.code-item input[type=number]{width:70px;padding:5px 8px;font-size:13px;border:1px solid #ddd;border-radius:6px}
+
+/* Stats */
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.stat{background:#fff;border-radius:8px;padding:14px;border:1px solid #e5e5e5}
+.stat-label{font-size:12px;color:#888;margin-bottom:4px}
+.stat-val{font-size:24px;font-weight:600;color:#111}
+.stat-sub{font-size:11px;color:#aaa;margin-top:2px}
+
+/* Table */
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:9px 12px;color:#888;font-weight:500;border-bottom:1px solid #f0f0f0}
+td{padding:10px 12px;border-bottom:1px solid #f0f0f0;color:#333}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#fafafa}
+.tag{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:500}
+.tag-green{background:#EAF3DE;color:#3B6D11}
+.tag-amber{background:#FAEEDA;color:#854F0B}
+.tag-blue{background:#E6F1FB;color:#185FA5}
+.tag-purple{background:#EEEDFE;color:#534AB7}
+
+/* Save bar */
+.save-bar{position:fixed;bottom:0;left:210px;right:0;background:#fff;border-top:1px solid #e5e5e5;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;z-index:10}
+.save-status{font-size:13px;color:#888}
+.btn-row{display:flex;gap:8px}
+.btn-ghost{padding:7px 14px;border:1px solid #ddd;border-radius:8px;background:none;cursor:pointer;font-size:13px;color:#666}
+.btn-ghost:hover{background:#f5f5f5}
+.btn-save{padding:7px 18px;background:#534AB7;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer}
+.btn-save:hover{background:#3C3489}
+.btn-danger{padding:7px 14px;border:1px solid #E24B4A;border-radius:8px;background:none;cursor:pointer;font-size:13px;color:#E24B4A}
+.btn-danger:hover{background:#FCEBEB}
+.content-pad{padding-bottom:80px}
+
+/* Client selector (admin) */
+.client-selector{display:flex;align-items:center;gap:10px;margin-bottom:20px;padding:12px 14px;background:#fff;border:1px solid #e5e5e5;border-radius:10px}
+.client-selector label{font-size:13px;color:#666;white-space:nowrap}
+.client-selector select{flex:1;padding:6px 10px;font-size:13px;border:1px solid #ddd;border-radius:6px;background:#fff}
+.avatar{width:28px;height:28px;border-radius:50%;background:#EEEDFE;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#534AB7;flex-shrink:0}
+</style>
+</head>
+<body>
+
+<!-- AUTH PAGE -->
+<div class="auth-wrap" id="auth-page">
+  <div class="auth-card">
+    <div class="auth-logo">joax<span>.</span>online</div>
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" id="login-email" placeholder="you@company.com">
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="login-password" placeholder="••••••••">
+    </div>
+    <button class="btn-primary" onclick="login()">Sign in</button>
+    <div class="auth-error hidden" id="auth-error"></div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="app hidden" id="dashboard">
+  <div class="sidebar">
+    <div class="sidebar-logo">joax<span>.</span>online</div>
+    <button class="nav-item active" onclick="showPage('pricing',this)">⚙️ Pricing editor</button>
+    <button class="nav-item" onclick="showPage('activity',this)">📊 Activity</button>
+    <button class="nav-item" onclick="showPage('leads',this)">📋 Leads</button>
+    <button class="nav-item" onclick="showPage('referrals',this)">🔗 Referrals</button>
+    <div id="admin-nav" class="hidden">
+      <div class="nav-section">Admin</div>
+      <button class="nav-item" onclick="showPage('clients',this)">👥 Clients</button>
+    </div>
+    <div style="flex:1"></div>
+    <div class="nav-section">Account</div>
+    <button class="nav-item" id="user-email-nav">👤 <span id="nav-email"></span></button>
+    <button class="nav-item" onclick="logout()" style="color:#E24B4A">🚪 Sign out</button>
+  </div>
+
+  <div class="main content-pad">
+
+    <!-- PRICING PAGE -->
+    <div class="page active" id="page-pricing">
+      <div class="page-title">Pricing editor</div>
+      <div class="page-sub">Changes save directly to your quote engine</div>
+
+      <div id="admin-client-selector" class="client-selector hidden">
+        <div class="avatar" id="sel-avatar">?</div>
+        <label>Editing config for:</label>
+        <select id="client-select" onchange="loadClientConfig()"></select>
+      </div>
+
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('rates',this)">Hourly rates</button>
+        <button class="tab" onclick="switchTab('hours',this)">Base hours</button>
+        <button class="tab" onclick="switchTab('protection',this)">Protection plan</button>
+        <button class="tab" onclick="switchTab('stairs',this)">Stairs</button>
+        <button class="tab" onclick="switchTab('fees',this)">Fees</button>
+        <button class="tab" onclick="switchTab('items',this)">Specialty items</button>
+        <button class="tab" onclick="switchTab('discounts',this)">Discounts</button>
+      </div>
+
+      <!-- RATES -->
+      <div id="tab-rates">
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">With truck</div>
+            <div class="card-sub">Hourly rate by crew size</div>
+            <div class="field-row"><div class="field-label">2 movers</div><div class="field-input"><span>$</span><input type="number" id="r_truck_2"><span>/hr</span></div></div>
+            <div class="field-row"><div class="field-label">3 movers</div><div class="field-input"><span>$</span><input type="number" id="r_truck_3"><span>/hr</span></div></div>
+            <div class="field-row"><div class="field-label">4 movers</div><div class="field-input"><span>$</span><input type="number" id="r_truck_4"><span>/hr</span></div></div>
+          </div>
+          <div class="card">
+            <div class="card-title">Without truck</div>
+            <div class="card-sub">Hourly rate by crew size</div>
+            <div class="field-row"><div class="field-label">2 movers</div><div class="field-input"><span>$</span><input type="number" id="r_notruck_2"><span>/hr</span></div></div>
+            <div class="field-row"><div class="field-label">3 movers</div><div class="field-input"><span>$</span><input type="number" id="r_notruck_3"><span>/hr</span></div></div>
+            <div class="field-row"><div class="field-label">4 movers</div><div class="field-input"><span>$</span><input type="number" id="r_notruck_4"><span>/hr</span></div></div>
+            <div class="field-row"><div class="field-label">5 movers</div><div class="field-input"><span>$</span><input type="number" id="r_notruck_5"><span>/hr</span></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HOURS -->
+      <div id="tab-hours" style="display:none">
+        <div class="card">
+          <div class="card-title">Base hours by bedroom count</div>
+          <div class="card-sub">Starting estimate before stairs or items are added</div>
+          <div class="field-row"><div class="field-label">1 bedroom</div><div class="field-input"><input type="number" id="h_1"><span>hrs</span></div></div>
+          <div class="field-row"><div class="field-label">2 bedrooms</div><div class="field-input"><input type="number" id="h_2"><span>hrs</span></div></div>
+          <div class="field-row"><div class="field-label">3 bedrooms</div><div class="field-input"><input type="number" id="h_3"><span>hrs</span></div></div>
+          <div class="field-row"><div class="field-label">4 bedrooms</div><div class="field-input"><input type="number" id="h_4"><span>hrs</span></div></div>
+          <div class="field-row"><div class="field-label">5+ bedrooms</div><div class="field-input"><input type="number" id="h_5"><span>hrs</span></div></div>
+        </div>
+      </div>
+
+      <!-- PROTECTION -->
+      <div id="tab-protection" style="display:none">
+        <div class="card">
+          <div class="card-title">Protection plan cost</div>
+          <div class="card-sub">Flat fee added to every estimate by bedroom count</div>
+          <div class="field-row"><div class="field-label">1 bedroom</div><div class="field-input"><span>$</span><input type="number" id="p_1"></div></div>
+          <div class="field-row"><div class="field-label">2 bedrooms</div><div class="field-input"><span>$</span><input type="number" id="p_2"></div></div>
+          <div class="field-row"><div class="field-label">3 bedrooms</div><div class="field-input"><span>$</span><input type="number" id="p_3"></div></div>
+          <div class="field-row"><div class="field-label">4 bedrooms</div><div class="field-input"><span>$</span><input type="number" id="p_4"></div></div>
+          <div class="field-row"><div class="field-label">5+ bedrooms</div><div class="field-input"><span>$</span><input type="number" id="p_5"></div></div>
+        </div>
+      </div>
+
+      <!-- STAIRS -->
+      <div id="tab-stairs" style="display:none">
+        <div class="card">
+          <div class="card-title">Stairs add-on</div>
+          <div class="card-sub">Extra hours added per flight of stairs</div>
+          <div class="field-row"><div class="field-label">1 flight</div><div class="field-input"><input type="number" id="s_1" step="0.05"><span>hrs</span></div></div>
+          <div class="field-row"><div class="field-label">2 flights</div><div class="field-input"><input type="number" id="s_2" step="0.05"><span>hrs</span></div></div>
+          <div class="field-row"><div class="field-label">3 flights</div><div class="field-input"><input type="number" id="s_3" step="0.05"><span>hrs</span></div></div>
+          <div class="field-row"><div class="field-label">4 flights</div><div class="field-input"><input type="number" id="s_4" step="0.05"><span>hrs</span></div></div>
+          <div class="field-row"><div class="field-label">5+ flights</div><div class="field-input"><input type="number" id="s_5" step="0.05"><span>hrs</span></div></div>
+        </div>
+      </div>
+
+      <!-- FEES -->
+      <div id="tab-fees" style="display:none">
+        <div class="card">
+          <div class="card-title">Fees &amp; surcharges</div>
+          <div class="card-sub">Toggle each fee on or off — only active fees appear in quotes</div>
+
+          <div class="toggle-row">
+            <div><div class="field-label">Minimum hours</div><div class="field-sub">Floor on labor time</div></div>
+            <div class="field-input"><input type="number" id="f_min_hours" style="width:60px"><span>hrs min</span></div>
+          </div>
+          <div class="toggle-row">
+            <div><div class="field-label">Fuel / travel fee</div><div class="field-sub">Flat fee per job</div></div>
+            <div class="field-input"><span>$</span><input type="number" id="f_fuel"></div>
+          </div>
+          <div class="toggle-row">
+            <div><div class="field-label">Elevator fee</div><div class="field-sub">Flat fee if elevator present</div></div>
+            <div class="field-input"><span>$</span><input type="number" id="f_elevator"></div>
+          </div>
+          <div class="toggle-row">
+            <div><div class="field-label">Long carry fee</div><div class="field-sub">Flat fee for long distance carries</div></div>
+            <div class="field-input"><span>$</span><input type="number" id="f_longcarry"></div>
+          </div>
+          <div class="toggle-row">
+            <div><div class="field-label">Weekend surcharge</div><div class="field-sub">Percentage added to total</div></div>
+            <div class="field-input"><input type="number" id="f_weekend" style="width:60px"><span>%</span></div>
+          </div>
+          <div class="toggle-row">
+            <div><div class="field-label">Cancellation fee</div><div class="field-sub">Shown as a notice in the quote email</div></div>
+            <div class="field-input"><span>$</span><input type="number" id="f_cancel"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Packing service</div>
+          <div class="card-sub">Choose how packing is charged</div>
+          <div class="field-row">
+            <div class="field-label">Pricing mode</div>
+            <select id="f_packing_mode" style="padding:5px 8px;font-size:13px;border:1px solid #ddd;border-radius:6px">
+              <option value="per_box">Per box</option>
+              <option value="flat">Flat fee</option>
+            </select>
+          </div>
+          <div class="field-row"><div class="field-label">Price per box</div><div class="field-input"><span>$</span><input type="number" id="f_packing_box"></div></div>
+          <div class="field-row"><div class="field-label">Flat fee</div><div class="field-input"><span>$</span><input type="number" id="f_packing_flat"></div></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Price range buffer</div>
+          <div class="card-sub">The low and high multipliers applied to the base total</div>
+          <div class="field-row"><div class="field-label">Low end</div><div class="field-input"><input type="number" id="f_range_low" step="0.01"><span>× total</span></div></div>
+          <div class="field-row"><div class="field-label">High end</div><div class="field-input"><input type="number" id="f_range_high" step="0.01"><span>× total</span></div></div>
+        </div>
+      </div>
+
+      <!-- SPECIALTY ITEMS -->
+      <div id="tab-items" style="display:none">
+        <div class="card">
+          <div class="card-title">Specialty items</div>
+          <div class="card-sub">Extra minutes added per item type — shown as a checkbox on the quote form</div>
+          <div id="specialty-list"></div>
+          <button class="add-btn" onclick="addSpecialtyItem()">+ Add item type</button>
+        </div>
+      </div>
+
+      <!-- DISCOUNTS -->
+      <div id="tab-discounts" style="display:none">
+        <div class="card">
+          <div class="card-title">Discount codes</div>
+          <div class="card-sub">Customers enter these on the quote form to get a discount</div>
+          <div id="discount-list"></div>
+          <button class="add-btn" onclick="addDiscountCode()">+ Add discount code</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACTIVITY PAGE -->
+    <div class="page" id="page-activity">
+      <div class="page-title">Activity</div>
+      <div class="page-sub">Quote requests across your system</div>
+      <div class="stats-grid">
+        <div class="stat"><div class="stat-label">Total quotes</div><div class="stat-val" id="stat-total">—</div></div>
+        <div class="stat"><div class="stat-label">This month</div><div class="stat-val" id="stat-month">—</div></div>
+        <div class="stat"><div class="stat-label">Avg. estimate</div><div class="stat-val" id="stat-avg">—</div></div>
+      </div>
+      <div class="card">
+        <div class="card-title" style="margin-bottom:12px">Recent quotes</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Email</th><th>Bedrooms</th><th>Estimate</th><th>Date</th></tr></thead>
+            <tbody id="quotes-table"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <!-- LEADS PAGE -->
+  <div class="page" id="page-leads">
+  <div class="page-title">Leads</div>
+  <div class="page-sub">Everyone who requested a quote</div>
+
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+    <input 
+      type="text" 
+      id="leads-search" 
+      placeholder="Search by name, email, phone..." 
+      oninput="searchLeads()"
+      style="flex:1;min-width:200px;padding:8px 12px;font-size:13px;border:1px solid #ddd;border-radius:8px">
+    <span style="font-size:13px;color:#888" id="leads-count"></span>
+    </div>
+
+  
+  
+
+  <div class="save-bar">
+    <span class="save-status" id="save-status">No unsaved changes</span>
+    <div class="btn-row">
+      <button class="btn-ghost" onclick="loadConfig()">Discard</button>
+      <button class="btn-save" onclick="saveConfig()">Save config</button>
+    </div>
+  </div>
+   <div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap">
+    <button class="status-filter tab active" onclick="filterLeadStatus('all')">All</button>
+    <button class="status-filter tab" onclick="filterLeadStatus('new')">🔵 New</button>
+    <button class="status-filter tab" onclick="filterLeadStatus('contacted')">🟡 Contacted</button>
+    <button class="status-filter tab" onclick="filterLeadStatus('booked')">🟢 Booked</button>
+    <button class="status-filter tab" onclick="filterLeadStatus('lost')">⚫ Lost</button>
+  </div>
+  <div class="card">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Name</th><th>Email</th><th>Phone</th><th>Size</th><th>Estimate</th><th>Sent</th><th>Status</th></tr>
+        </thead>
+        <tbody id="leads-table"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+  <!-- CLIENTS PAGE (admin only) -->
+    <div class="page" id="page-clients">
+      <div class="page-title">Clients</div>
+      <div class="page-sub">All moving companies on your platform</div>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Company</th><th>Slug</th><th>Plan</th><th>Status</th><th></th></tr></thead>
+            <tbody id="clients-table"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+<!-- REFERRALS PAGE -->
+<div class="page" id="page-referrals">
+  <div class="page-title">Referrals</div>
+  <div class="page-sub" id="ref-sub">Your referral link</div>
+
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-title" style="margin-bottom:8px">Your referral link</div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <code id="ref-link" style="flex:1;padding:9px 12px;background:var(--color-background-secondary,#f5f5f5);border-radius:8px;font-size:13px;border:1px solid var(--color-border-tertiary,#eee)"></code>
+      <button class="btn-save" onclick="copyRefLink()">Copy</button>
+    </div>
+    <div style="font-size:12px;color:var(--color-text-secondary,#888);margin-top:8px">
+      Share this link with other moving companies. When they sign up you earn 1 free month.
+    </div>
+  </div>
+
+  <div class="stats-grid" style="margin-bottom:16px">
+    <div class="stat"><div class="stat-label">Total referrals</div><div class="stat-val" id="ref-total">—</div></div>
+    <div class="stat"><div class="stat-label">Converted</div><div class="stat-val" id="ref-converted">—</div></div>
+    <div class="stat"><div class="stat-label">Free months earned</div><div class="stat-val" id="ref-months">—</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" style="margin-bottom:12px">Referral history</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Company</th><th>Email</th><th>Date</th><th>Status</th></tr></thead>
+        <tbody id="ref-table"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ADMIN ONLY: all referrals -->
+  <div id="admin-referrals" class="hidden" style="margin-top:24px">
+    <div class="page-title" style="font-size:16px;margin-bottom:4px">All referrals</div>
+    <div class="page-sub" style="margin-bottom:16px">Across all clients</div>
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Referred by</th><th>Company</th><th>Email</th><th>Date</th><th>Status</th></tr></thead>
+          <tbody id="all-ref-table"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+ 
+
+<script>
+const SUPABASE_URL = 'https://izppuvmdowgctlligvfi.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml6cHB1dm1kb3dnY3RsbGlndmZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2MjI4NzIsImV4cCI6MjA5NDE5ODg3Mn0.0_itRpM7I8vW7gjN1bhcZf0FlB_P-pc9KQ-K4oEMEqE';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+let currentUser = null;
+let currentClient = null;
+let isAdmin = false;
+let allClients = [];
+
+const tabs = ['rates','hours','protection','stairs','fees','items','discounts'];
+
+async function init() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) {
+    currentUser = session.user;
+    await setupDashboard();
+  }
+}
+
+async function login() {
+  const email = document.getElementById('login-email').value;
+  const pass = document.getElementById('login-password').value;
+  const err = document.getElementById('auth-error');
+  err.classList.add('hidden');
+  const { error } = await sb.auth.signInWithPassword({ email, password: pass });
+  if (error) {
+    err.textContent = error.message;
+    err.classList.remove('hidden');
+  } else {
+    const { data: { user } } = await sb.auth.getUser();
+    currentUser = user;
+    await setupDashboard();
+  }
+}
+
+async function setupDashboard() {
+  document.getElementById('auth-page').classList.add('hidden');
+  document.getElementById('dashboard').classList.remove('hidden');
+  document.getElementById('nav-email').textContent = currentUser.email;
+
+  const { data: clientRow } = await sb
+    .from('clients')
+    .select('*')
+    .eq('user_id', currentUser.id)
+    .single();
+
+  if (clientRow && clientRow.is_admin) {
+    isAdmin = true;
+    document.getElementById('admin-nav').classList.remove('hidden');
+    document.getElementById('admin-client-selector').classList.remove('hidden');
+    await loadAllClients();
+  } else {
+    currentClient = clientRow;
+    await loadConfig();
+    await loadActivity();
+  }
+}
+
+async function loadAllClients() {
+  const { data } = await sb.from('clients').select('*').order('company_name');
+  allClients = data || [];
+  const sel = document.getElementById('client-select');
+  sel.innerHTML = allClients.map(c =>
+    `<option value="${c.id}">${c.company_name}</option>`
+  ).join('');
+  if (allClients.length > 0) {
+    currentClient = allClients[0];
+    updateAvatar();
+    await loadConfig();
+    await loadActivity();
+    await loadClientsTable();
+  }
+}
+
+async function loadClientConfig() {
+  const id = document.getElementById('client-select').value;
+  currentClient = allClients.find(c => c.id === id);
+  updateAvatar();
+  await loadConfig();
+}
+
+function updateAvatar() {
+  if (!currentClient) return;
+  const words = currentClient.company_name.split(' ');
+  const initials = words.length >= 2 ? words[0][0] + words[1][0] : words[0].slice(0,2);
+  document.getElementById('sel-avatar').textContent = initials.toUpperCase();
+}
+
+async function loadConfig() {
+  if (!currentClient) return;
+  const { data } = await sb
+    .from('pricing_configs')
+    .select('config')
+    .eq('client_id', currentClient.id)
+    .single();
+
+  const c = data?.config || {};
+  const bh = c.base_hours || {};
+  const rt = c.rates_with_truck || {};
+  const rn = c.rates_without_truck || {};
+  const st = c.stairs_addon || {};
+  const pp = c.protection_plan || {};
+
+  // Rates
+  ['2','3','4'].forEach(n => setVal('r_truck_'+n, rt[n]||''));
+  ['2','3','4','5'].forEach(n => setVal('r_notruck_'+n, rn[n]||''));
+  // Hours
+  ['1','2','3','4','5'].forEach(n => setVal('h_'+n, bh[n]||''));
+  // Protection
+  ['1','2','3','4','5'].forEach(n => setVal('p_'+n, pp[n]||''));
+  // Stairs
+  ['1','2','3','4','5'].forEach(n => setVal('s_'+n, st[n]||''));
+  // Fees
+  setVal('f_min_hours', c.minimum_hours||2);
+  setVal('f_fuel', c.fuel_fee||0);
+  setVal('f_elevator', c.elevator_fee||0);
+  setVal('f_longcarry', c.long_carry_fee||0);
+  setVal('f_weekend', c.weekend_surcharge_pct||0);
+  setVal('f_cancel', c.cancellation_fee||0);
+  setVal('f_packing_box', c.packing_price_per_box||0);
+  setVal('f_packing_flat', c.packing_flat_fee||0);
+  setVal('f_range_low', c.range_low_pct||0.9);
+  setVal('f_range_high', c.range_high_pct||1.18);
+  document.getElementById('f_packing_mode').value = c.packing_mode || 'per_box';
+
+  // Specialty items
+  renderSpecialtyItems(c.specialty_items || []);
+  // Discount codes
+  renderDiscountCodes(c.discount_codes || {});
+
+  document.getElementById('save-status').textContent = 'Config loaded';
+}
+
+function setVal(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.value = val;
+}
+
+function getVal(id) {
+  const el = document.getElementById(id);
+  return el ? parseFloat(el.value) || 0 : 0;
+}
+
+function renderSpecialtyItems(items) {
+  const list = document.getElementById('specialty-list');
+  list.innerHTML = '';
+  items.forEach((item, i) => {
+    const d = document.createElement('div');
+    d.className = 'custom-item';
+    d.innerHTML = `
+      <input type="text" placeholder="Item name" value="${item.label||''}" data-si-label="${i}">
+      <div class="field-input">
+        <input type="number" value="${item.minutes||30}" style="width:60px" data-si-min="${i}">
+        <span style="font-size:12px">min</span>
+      </div>
+      <button class="del-btn" onclick="this.closest('.custom-item').remove()">×</button>
+    `;
+    list.appendChild(d);
+  });
+}
+
+function addSpecialtyItem() {
+  const list = document.getElementById('specialty-list');
+  const i = list.children.length;
+  const d = document.createElement('div');
+  d.className = 'custom-item';
+  d.innerHTML = `
+    <input type="text" placeholder="Item name" data-si-label="${i}">
+    <div class="field-input">
+      <input type="number" value="30" style="width:60px" data-si-min="${i}">
+      <span style="font-size:12px">min</span>
+    </div>
+    <button class="del-btn" onclick="this.closest('.custom-item').remove()">×</button>
+  `;
+  list.appendChild(d);
+  d.querySelector('input[type=text]').focus();
+}
+
+function getSpecialtyItems() {
+  const items = [];
+  document.querySelectorAll('#specialty-list .custom-item').forEach(row => {
+    const label = row.querySelector('input[type=text]').value.trim();
+    const minutes = parseFloat(row.querySelector('input[type=number]').value) || 0;
+    if (label) items.push({ label, minutes });
+  });
+  return items;
+}
+
+function renderDiscountCodes(codes) {
+  const list = document.getElementById('discount-list');
+  list.innerHTML = '';
+  Object.entries(codes).forEach(([code, d]) => {
+    addDiscountCodeRow(code, d.type, d.value);
+  });
+}
+
+function addDiscountCode() {
+  addDiscountCodeRow('', 'percent', 10);
+}
+
+function addDiscountCodeRow(code, type, value) {
+  const list = document.getElementById('discount-list');
+  const d = document.createElement('div');
+  d.className = 'code-item';
+  d.innerHTML = `
+    <input type="text" placeholder="Code e.g. SAVE10" value="${code}" style="width:120px;padding:5px 8px;font-size:13px;border:1px solid #ddd;border-radius:6px">
+    <select style="padding:5px 8px;font-size:13px;border:1px solid #ddd;border-radius:6px;background:#fff">
+      <option value="percent" ${type==='percent'?'selected':''}>% off</option>
+      <option value="flat" ${type==='flat'?'selected':''}>$ off</option>
+    </select>
+    <input type="number" value="${value}" style="width:70px;padding:5px 8px;font-size:13px;border:1px solid #ddd;border-radius:6px">
+    <button class="del-btn" onclick="this.closest('.code-item').remove()">×</button>
+  `;
+  list.appendChild(d);
+}
+
+function getDiscountCodes() {
+  const codes = {};
+  document.querySelectorAll('#discount-list .code-item').forEach(row => {
+    const inputs = row.querySelectorAll('input');
+    const sel = row.querySelector('select');
+    const code = inputs[0].value.trim().toUpperCase();
+    if (code) codes[code] = { type: sel.value, value: parseFloat(inputs[1].value)||0 };
+  });
+  return codes;
+}
+
+async function saveConfig() {
+  if (!currentClient) return;
+  const status = document.getElementById('save-status');
+  status.textContent = 'Saving…';
+
+  const config = {
+    rates_with_truck: { 2: getVal('r_truck_2'), 3: getVal('r_truck_3'), 4: getVal('r_truck_4') },
+    rates_without_truck: { 2: getVal('r_notruck_2'), 3: getVal('r_notruck_3'), 4: getVal('r_notruck_4'), 5: getVal('r_notruck_5') },
+    base_hours: { 1: getVal('h_1'), 2: getVal('h_2'), 3: getVal('h_3'), 4: getVal('h_4'), 5: getVal('h_5') },
+    protection_plan: { 1: getVal('p_1'), 2: getVal('p_2'), 3: getVal('p_3'), 4: getVal('p_4'), 5: getVal('p_5') },
+    stairs_addon: { 1: getVal('s_1'), 2: getVal('s_2'), 3: getVal('s_3'), 4: getVal('s_4'), 5: getVal('s_5') },
+    minimum_hours: getVal('f_min_hours'),
+    fuel_fee: getVal('f_fuel'),
+    elevator_fee: getVal('f_elevator'),
+    long_carry_fee: getVal('f_longcarry'),
+    weekend_surcharge_pct: getVal('f_weekend'),
+    cancellation_fee: getVal('f_cancel'),
+    packing_price_per_box: getVal('f_packing_box'),
+    packing_flat_fee: getVal('f_packing_flat'),
+    packing_mode: document.getElementById('f_packing_mode').value,
+    range_low_pct: getVal('f_range_low'),
+    range_high_pct: getVal('f_range_high'),
+    specialty_items: getSpecialtyItems(),
+    discount_codes: getDiscountCodes(),
+  };
+
+  const { error } = await sb.from('pricing_configs')
+    .upsert({ client_id: currentClient.id, config, updated_at: new Date().toISOString() },
+             { onConflict: 'client_id' });
+
+  status.textContent = error
+    ? '❌ Error: ' + error.message
+    : '✓ Saved at ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
+async function loadActivity() {
+  if (!currentClient) return;
+  let query = sb.from('quotes').select('*').order('created_at', { ascending: false }).limit(20);
+  if (!isAdmin) query = query.eq('client_id', currentClient.id);
+
+  const { data: quotes } = await query;
+  if (!quotes) return;
+
+  const now = new Date();
+  const thisMonth = quotes.filter(q => new Date(q.created_at).getMonth() === now.getMonth());
+  const avgs = quotes.map(q => q.quote_result?.subtotal).filter(Boolean);
+  const avg = avgs.length ? Math.round(avgs.reduce((a,b)=>a+b,0)/avgs.length) : 0;
+
+  document.getElementById('stat-total').textContent = quotes.length;
+  document.getElementById('stat-month').textContent = thisMonth.length;
+  document.getElementById('stat-avg').textContent = avg ? '$' + avg.toLocaleString() : '—';
+
+  const tbody = document.getElementById('quotes-table');
+  tbody.innerHTML = quotes.map(q => `
+    <tr>
+      <td>${maskEmail(q.customer_email)}</td>
+      <td>${q.form_answers?.bedrooms || '—'} bed</td>
+      <td>$${(q.quote_result?.low||0).toLocaleString()} – $${(q.quote_result?.high||0).toLocaleString()}</td>
+      <td>${new Date(q.created_at).toLocaleDateString()}</td>
+    </tr>
+  `).join('');
+}
+
+async function loadLeads() {
+  if (!currentClient) return;
+  let query = sb.from('quotes')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(100);
+  if (!isAdmin) query = query.eq('client_id', currentClient.id);
+
+  const { data: quotes } = await query;
+  if (!quotes) return;
+
+  window._allLeads = quotes;
+  renderLeads(quotes);
+}
+async function loadReferrals() {
+  if (!currentClient) return;
+
+  // Set referral link
+  const slug = currentClient.slug || '';
+  const link = `https://joax.online/ref/${slug}.html`;
+  const linkEl = document.getElementById('ref-link');
+  if (linkEl) linkEl.textContent = link;
+
+  // Load this client's referrals
+  const { data: refs } = await sb.from('referrals')
+    .select('*')
+    .eq('referrer_client_id', currentClient.id)
+    .neq('status', 'clicked')
+    .order('created_at', { ascending: false });
+
+  const converted = (refs||[]).filter(r => r.status === 'converted').length;
+  document.getElementById('ref-total').textContent = (refs||[]).length;
+  document.getElementById('ref-converted').textContent = converted;
+  document.getElementById('ref-months').textContent = currentClient.free_months_earned || 0;
+
+  const tbody = document.getElementById('ref-table');
+  tbody.innerHTML = (refs||[]).length ? (refs||[]).map(r => `
+    <tr>
+      <td>${r.referred_company_name || '—'}</td>
+      <td style="font-size:12px">${r.referred_email || '—'}</td>
+      <td style="font-size:12px;color:#888">${new Date(r.created_at).toLocaleDateString()}</td>
+      <td><span class="tag ${r.status==='converted'?'tag-green':'tag-amber'}">${r.status}</span></td>
+    </tr>
+  `).join('') : '<tr><td colspan="4" style="text-align:center;color:#888;padding:20px">No referrals yet — share your link!</td></tr>';
+
+  // Admin: show all referrals
+  if (isAdmin) {
+    document.getElementById('admin-referrals').classList.remove('hidden');
+    const { data: allRefs } = await sb.from('referrals')
+      .select('*, clients(company_name)')
+      .neq('status', 'clicked')
+      .order('created_at', { ascending: false });
+
+    const allTbody = document.getElementById('all-ref-table');
+    allTbody.innerHTML = (allRefs||[]).length ? (allRefs||[]).map(r => `
+      <tr>
+        <td>${r.clients?.company_name || '—'}</td>
+        <td>${r.referred_company_name || '—'}</td>
+        <td style="font-size:12px">${r.referred_email || '—'}</td>
+        <td style="font-size:12px;color:#888">${new Date(r.created_at).toLocaleDateString()}</td>
+        <td>
+          <select onchange="updateReferralStatus('${r.id}', this.value)" style="padding:4px 8px;font-size:12px;border:1px solid #ddd;border-radius:6px">
+            <option value="pending" ${r.status==='pending'?'selected':''}>Pending</option>
+            <option value="converted" ${r.status==='converted'?'selected':''}>Converted ✓</option>
+            <option value="lost" ${r.status==='lost'?'selected':''}>Lost</option>
+          </select>
+        </td>
+      </tr>
+    `).join('') : '<tr><td colspan="5" style="text-align:center;color:#888;padding:20px">No referrals yet</td></tr>';
+  }
+}
+
+async function updateReferralStatus(id, status) {
+  await sb.from('referrals').update({ status }).eq('id', id);
+  if (status === 'converted') {
+    // Get referrer and add free month
+    const { data: ref } = await sb.from('referrals').select('referrer_client_id').eq('id', id).single();
+    if (ref) {
+      const { data: client } = await sb.from('clients').select('free_months_earned').eq('id', ref.referrer_client_id).single();
+      await sb.from('clients').update({ free_months_earned: (client?.free_months_earned || 0) + 1 }).eq('id', ref.referrer_client_id);
+    }
+  }
+  loadReferrals();
+}
+
+function copyRefLink() {
+  const link = document.getElementById('ref-link').textContent;
+  navigator.clipboard.writeText(link);
+  document.querySelector('.btn-save').textContent = '✓ Copied';
+  setTimeout(() => document.querySelector('.btn-save').textContent = 'Copy', 2000);
+}
+
+function renderLeads(quotes) {
+  const tbody = document.getElementById('leads-table');
+  tbody.innerHTML = quotes.map(q => {
+    const answers = q.form_answers || {};
+    const result = q.quote_result || {};
+    const date = new Date(q.created_at);
+    const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    const timeStr = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    const status = q.status || 'new';
+    const statusColors = {
+      new: 'tag-blue', contacted: 'tag-amber', booked: 'tag-green', lost: 'background:#eee;color:#888'
+    };
+    return `
+      <tr>
+        <td>${answers.name || '—'}</td>
+        <td><a href="mailto:${q.customer_email}" style="color:#534AB7">${q.customer_email}</a></td>
+        <td>${answers.phone || '—'}</td>
+        <td>${answers.bedrooms ? answers.bedrooms + ' bed' : '—'}</td>
+        <td style="font-weight:500">$${(result.low||0).toLocaleString()} – $${(result.high||0).toLocaleString()}</td>
+        <td>
+          <div style="font-size:13px">${dateStr}</div>
+          <div style="font-size:11px;color:#aaa">${timeStr}</div>
+        </td>
+        <td>
+          <select onchange="updateLeadStatus('${q.id}', this.value)" style="padding:4px 8px;font-size:12px;border:1px solid #ddd;border-radius:6px;background:#fff">
+            <option value="new" ${status==='new'?'selected':''}>🔵 New</option>
+            <option value="contacted" ${status==='contacted'?'selected':''}>🟡 Contacted</option>
+            <option value="booked" ${status==='booked'?'selected':''}>🟢 Booked</option>
+            <option value="lost" ${status==='lost'?'selected':''}>⚫ Lost</option>
+          </select>
+        </td>
+      </tr>
+    `;
+  }).join('');
+
+  document.getElementById('leads-count').textContent = quotes.length + ' leads';
+}
+
+function searchLeads() {
+  const q = document.getElementById('leads-search').value.toLowerCase();
+  const filtered = (window._allLeads || []).filter(lead => {
+    const answers = lead.form_answers || {};
+    return (
+      (lead.customer_email || '').toLowerCase().includes(q) ||
+      (answers.name || '').toLowerCase().includes(q) ||
+      (answers.phone || '').toLowerCase().includes(q)
+    );
+  });
+  renderLeads(filtered);
+}
+
+function filterLeadStatus(status) {
+  document.querySelectorAll('.status-filter').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  if (status === 'all') {
+    renderLeads(window._allLeads || []);
+  } else {
+    const filtered = (window._allLeads || []).filter(l => (l.status || 'new') === status);
+    renderLeads(filtered);
+  }
+}
+
+async function updateLeadStatus(quoteId, status) {
+  await sb.from('quotes').update({ status }).eq('id', quoteId);
+}
+
+async function updateLeadStatus(quoteId, status) {
+  await sb.from('quotes').update({ status }).eq('id', quoteId);
+}
+
+async function loadClientsTable() {
+  const tbody = document.getElementById('clients-table');
+  tbody.innerHTML = allClients.map(c => `
+    <tr>
+      <td><div style="font-weight:500">${c.company_name}</div><div style="font-size:12px;color:#aaa">${c.email}</div></td>
+      <td><code style="font-size:12px;background:#f5f5f5;padding:2px 6px;border-radius:4px">${c.slug||'—'}</code></td>
+      <td><span class="tag ${c.plan==='pro'?'tag-green':'tag-blue'}">${c.plan||'trial'}</span></td>
+      <td><span class="tag ${c.active?'tag-green':'tag-amber'}">${c.active?'Active':'Inactive'}</span></td>
+      <td><button class="btn-ghost" style="font-size:12px;padding:4px 10px" onclick="editClient('${c.id}')">Edit pricing</button></td>
+    </tr>
+  `).join('');
+}
+
+function editClient(id) {
+  document.getElementById('client-select').value = id;
+  loadClientConfig();
+  showPage('pricing', document.querySelector('.nav-item.active'));
+}
+
+function maskEmail(email) {
+  if (!email) return '—';
+  const [user, domain] = email.split('@');
+  return user.slice(0,3) + '***@' + domain;
+}
+
+function switchTab(id, el) {
+  tabs.forEach(t => {
+    const tab = document.getElementById('tab-'+t);
+    if (tab) tab.style.display = t === id ? 'block' : 'none';
+  });
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function showPage(id, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  if (el) el.classList.add('active');
+  if (id === 'activity') loadActivity();
+  if (id === 'clients') loadClientsTable();
+  if (id === 'leads') loadLeads();
+  if (id === 'referrals') loadReferrals();
+}
+
+async function logout() {
+  await sb.auth.signOut();
+  location.reload();
+}
+
+init();
+</script>
+</body>
+</html>
