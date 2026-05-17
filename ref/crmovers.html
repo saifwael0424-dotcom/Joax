@@ -9,6 +9,7 @@
 <style>
 :root{--accent:#7c6ff7;--accent2:#a78bfa;--bg:#0a0a0f;--surface:#111118;--border:#2a2a3a;--text:#e8e8f0;--text2:#8888aa}
 *{box-sizing:border-box;margin:0;padding:0}
+.hidden{display:none!important}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
 .wrap{max-width:520px;width:100%;text-align:center}
 .badge{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;background:rgba(124,111,247,0.1);border:1px solid rgba(124,111,247,0.3);border-radius:20px;font-size:12px;color:var(--accent2);margin-bottom:24px;font-family:'DM Mono',monospace}
@@ -54,12 +55,12 @@ h1 span{color:var(--accent2)}
 
   <div class="form-card" id="form-wrap">
     <div class="form-title">Request a demo</div>
-    <div class="form-sub">We'll reach out to get you set up — usually within 24 hours.</div>
-    <div class="field"><label>Your name</label><input type="text" id="r-name" placeholder="John Smith"></div>
-    <div class="field"><label>Company name</label><input type="text" id="r-company" placeholder="No Problem Movers"></div>
-    <div class="field"><label>Email</label><input type="email" id="r-email" placeholder="john@noproblemmovers.com"></div>
-    <div class="field"><label>Phone (optional)</label><input type="text" id="r-phone" placeholder="+1 (555) 000-0000"></div>
-    <button class="btn" onclick="submitReferral()">Request demo →</button>
+    <div class="form-sub">We'll reach out to get you set up — usually within 2 hours.</div>
+    <div class="field"><label>Your name</label><input type="text" id="r-name" placeholder="Your Name"></div>
+    <div class="field"><label>Company name</label><input type="text" id="r-company" placeholder="Write your company name"></div>
+    <div class="field"><label>Email</label><input type="email" id="r-email" placeholder="Write your email"></div>
+    <div class="field"><label>Phone</label><input type="text" id="r-phone" placeholder="+1 (555) 000-0000"></div>
+    <button class="btn" onclick="submitReferral()">Request a free demo →</button>
   </div>
 
   <div class="success hidden" id="success-wrap">
