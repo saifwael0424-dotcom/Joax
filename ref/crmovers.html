@@ -125,7 +125,7 @@ async function submitReferral() {
       body: JSON.stringify({ name, company, email, phone, referred_by: REFERRER_SLUG })
     });
   } catch(e) {}
-
+  console.log('showing success');
   document.getElementById('form-wrap').classList.add('hidden');
   document.getElementById('success-wrap').classList.remove('hidden');
 }
