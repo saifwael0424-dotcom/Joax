@@ -77,6 +77,14 @@ body{font-family:system-ui,sans-serif;background:#f5f5f5;min-height:100vh;displa
       <label>Phone number</label>
       <input type="text" id="f-phone" placeholder="+1 (555) 000-0000">
     </div>
+    <div class="form-group">
+      <label>Starting address <span style="color:#E24B4A">*</span></label>
+      <input type="text" id="f-address-from" placeholder="123 Main St, City, State">
+    </div>
+    <div class="form-group">
+      <label>Ending address <span style="color:#E24B4A">*</span></label>
+      <input type="text" id="f-address-to" placeholder="456 Oak Ave, City, State">
+    </div>
     <button class="btn-next" onclick="nextStep(1)">Continue →</button>
   </div>
 
@@ -210,6 +218,10 @@ body{font-family:system-ui,sans-serif;background:#f5f5f5;min-height:100vh;displa
 
 </div>
 
+<div style="text-align:center;margin-top:14px;font-size:12px;color:#bbb">
+  Powered by <a href="https://joax.online" target="_blank" rel="noopener" style="color:#534AB7;text-decoration:none;font-weight:500">Joax</a>
+</div>
+
 <script>
 // ─── CONFIG ───────────────────────────────────────────────
 const API_URL = 'https://n8n.srv1058135.hstgr.cloud/webhook';
@@ -270,7 +282,7 @@ function buildDynamicFields() {
     items.forEach((item, i) => {
       const label = document.createElement('label');
       label.className = 'checkbox-option';
-      label.innerHTML = `<input type="checkbox" value="${item.minutes}" data-label="${item.label}"> ${item.label} <span style="margin-left:auto;font-size:12px;color:#aaa">+${item.minutes} min</span>`;
+      label.innerHTML = `<input type="checkbox" value="${item.minutes}" data-label="${item.label}"> ${item.label}`;
       container.appendChild(label);
     });
   } else {
@@ -304,9 +316,15 @@ function nextStep(from) {
   if (from === 1) {
     const email = document.getElementById('f-email').value;
     if (!email || !email.includes('@')) { alert('Please enter a valid email.'); return; }
+    const addrFrom = document.getElementById('f-address-from').value.trim();
+    const addrTo = document.getElementById('f-address-to').value.trim();
+    if (!addrFrom) { alert('Please enter your starting address.'); return; }
+    if (!addrTo) { alert('Please enter your ending address.'); return; }
     formData.email = email;
     formData.name = document.getElementById('f-name').value;
     formData.phone = document.getElementById('f-phone').value;
+    formData.address_from = addrFrom;
+    formData.address_to = addrTo;
   }
   if (from === 2) {
     const bedrooms = document.querySelector('input[name=bedrooms]:checked');
@@ -363,10 +381,13 @@ function applyDiscount() {
 
 async function submitQuote() {
   const heavyItems = [];
+  const specialtyLabels = [];
   document.querySelectorAll('#specialty-checkboxes input[type=checkbox]:checked').forEach(cb => {
     heavyItems.push(parseInt(cb.value));
+    specialtyLabels.push(cb.dataset.label);
   });
   formData.heavy_items = heavyItems;
+  formData.specialty_labels = specialtyLabels;
 
   const packingChoice = document.querySelector('input[name=packing]:checked');
   if (packingChoice && packingChoice.value === 'yes') {
