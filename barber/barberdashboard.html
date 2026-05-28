@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>لوحة الحلاق | نظام الأدوار</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:      #0a0a0a;
+      --surface: #131313;
+      --card:    #181818;
+      --card2:   #1e1e1e;
+      --border:  #262626;
+      --gold:    #c8973a;
+      --gold2:   #f0c060;
+      --cream:   #f0e8d8;
+      --muted:   #555;
+      --muted2:  #777;
+      --red:     #c0392b;
+      --red2:    #e74c3c;
+      --green:   #27ae60;
+      --green2:  #2ecc71;
+      --amber:   #e67e22;
+      --text:    #ddd8ce;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Cairo', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ---- Top bar ---- */
+    .topbar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      height: 60px;
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .topbar::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      opacity: 0.3;
+    }
+
+    .brand {
+      font-size: 17px;
+      font-weight: 900;
+      color: var(--gold);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-badge {
+      font-size: 10px;
+      font-weight: 600;
+      background: rgba(200,151,58,0.15);
+      color: var(--gold);
+      border: 1px solid rgba(200,151,58,0.3);
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .stat-mini {
+      text-align: center;
+    }
+    .stat-mini .v {
+      font-size: 20px;
+      font-weight: 900;
+      color: var(--gold);
+      line-height: 1;
+    }
+    .stat-mini .l {
+      font-size: 9px;
+      color: var(--muted);
+      letter-spacing: 0.5px;
+    }
+
+    .live-dot {
+      width: 8px; height: 8px;
+      background: var(--green2);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+      display: inline-block;
+    }
+    @keyframes pulse {
+      0%,100% { opacity:1; box-shadow: 0 0 0 0 rgba(46,204,113,0.4); }
+      50%      { opacity:0.7; box-shadow: 0 0 0 5px rgba(46,204,113,0); }
+    }
+
+    .nav-link {
+      font-size: 12px;
+      color: var(--muted2);
+      text-decoration: none;
+      padding: 5px 10px;
+      border-radius: 6px;
+      transition: all 0.2s;
+      font-weight: 400;
+    }
+    .nav-link:hover { background: var(--card2); color: var(--text); }
+
+    /* ---- Layout ---- */
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 20px;
+      padding: 20px;
+      max-width: 1080px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 760px) {
+      .layout { grid-template-columns: 1fr; }
+      .sidebar { display: contents; }
+    }
+
+    /* ---- Section label ---- */
+    .sec-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+      padding-right: 2px;
+    }
+
+    /* ---- Serving card ---- */
+    .serving-wrap {
+      margin-bottom: 16px;
+    }
+
+    .serving-card {
+      background: var(--card);
+      border: 1px solid rgba(200,151,58,0.2);
+      border-radius: 14px;
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .serving-card::before {
+      content: '';
+      position: absolute;
+      top: 0; right: 0; left: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    }
+
+    .serving-card .sc-label {
+      font-size: 11px;
+      color: var(--gold);
+      font-weight: 600;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+
+    .serving-card .sc-name {
+      font-size: 28px;
+      font-weight: 900;
+      color: var(--cream);
+      line-height: 1.2;
+    }
+
+    .serving-card .sc-num {
+      font-size: 14px;
+      color: var(--muted2);
+      margin-top: 4px;
+    }
+
+    .serving-card .sc-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+
+    /* ---- Next btn ---- */
+    .next-btn-wrap {
+      margin-bottom: 20px;
+    }
+
+    /* ---- Buttons ---- */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 9px;
+      font-family: 'Cairo', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.1s;
+      white-space: nowrap;
+    }
+    .btn:hover   { opacity: 0.85; }
+    .btn:active  { transform: scale(0.97); }
+    .btn:disabled { opacity: 0.3; cursor: not-allowed; transform: none; }
+
+    .btn-gold    { background: linear-gradient(135deg, var(--gold), var(--gold2)); color: #0a0a0a; }
+    .btn-green   { background: rgba(39,174,96,0.15); color: var(--green2); border: 1px solid rgba(39,174,96,0.25); }
+    .btn-amber   { background: rgba(230,126,34,0.15); color: var(--amber); border: 1px solid rgba(230,126,34,0.25); }
+    .btn-red     { background: rgba(192,57,43,0.15); color: var(--red2); border: 1px solid rgba(192,57,43,0.25); }
+    .btn-ghost   { background: var(--card2); color: var(--muted2); border: 1px solid var(--border); }
+
+    .btn-full  { width: 100%; justify-content: center; }
+    .btn-big   { padding: 15px 24px; font-size: 17px; }
+
+    /* ---- Queue list ---- */
+    .queue-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    .q-header {
+      display: grid;
+      grid-template-columns: 52px 1fr 100px 110px;
+      padding: 10px 18px;
+      background: #111;
+      border-bottom: 1px solid var(--border);
+      font-size: 10px;
+      color: var(--muted);
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    @media (max-width: 540px) {
+      .q-header { grid-template-columns: 44px 1fr 90px; }
+      .q-header .col-phone,
+      .q-row    .col-phone { display: none; }
+    }
+
+    .q-row {
+      display: grid;
+      grid-template-columns: 52px 1fr 100px 110px;
+      padding: 13px 18px;
+      border-bottom: 1px solid var(--border);
+      align-items: center;
+      transition: background 0.15s;
+    }
+    .q-row:last-child { border-bottom: none; }
+    .q-row:hover { background: #1f1f1f; }
+
+    .q-row.row-serving {
+      background: rgba(200,151,58,0.06);
+      border-right: 2px solid var(--gold);
+    }
+    .q-row.row-done    { opacity: 0.35; }
+    .q-row.row-skipped { opacity: 0.25; }
+
+    .q-num {
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--gold);
+    }
+
+    .q-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .q-phone {
+      font-size: 12px;
+      color: var(--muted2);
+      font-family: monospace;
+      direction: ltr;
+      text-align: left;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 100px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .badge-waiting  { background: #1e1e1e; color: #666; border: 1px solid #2a2a2a; }
+    .badge-serving  { background: rgba(200,151,58,0.15); color: var(--gold); border: 1px solid rgba(200,151,58,0.3); }
+    .badge-done     { background: rgba(39,174,96,0.1); color: var(--green2); border: 1px solid rgba(39,174,96,0.2); }
+    .badge-skipped  { background: #151515; color: #444; border: 1px solid #222; }
+
+    /* ---- Sidebar ---- */
+    .side-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+      margin-bottom: 14px;
+    }
+
+    .side-card h3 {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--gold);
+      margin-bottom: 14px;
+    }
+
+    .next-num {
+      font-size: 52px;
+      font-weight: 900;
+      color: var(--text);
+      line-height: 1;
+    }
+
+    .next-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--cream);
+      margin-top: 4px;
+    }
+
+    .next-phone {
+      font-size: 12px;
+      color: var(--muted2);
+      margin-top: 2px;
+      direction: ltr;
+      text-align: right;
+    }
+
+    /* Stats grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .stat-box {
+      background: var(--card2);
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+    }
+    .stat-box .sv {
+      font-size: 30px;
+      font-weight: 900;
+      line-height: 1;
+    }
+    .stat-box .sl {
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+
+    /* Log */
+    .log-list {
+      max-height: 180px;
+      overflow-y: auto;
+    }
+    .log-list::-webkit-scrollbar { width: 3px; }
+    .log-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    .log-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 7px 0;
+      border-bottom: 1px solid #1a1a1a;
+      font-size: 12px;
+      gap: 8px;
+    }
+    .log-item:last-child { border-bottom: none; }
+    .log-item .lt { color: var(--muted2); flex: 1; }
+    .log-item .ltime { color: var(--muted); font-size: 10px; white-space: nowrap; }
+
+    /* Empty state */
+    .empty {
+      text-align: center;
+      padding: 36px 20px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .empty .ei { font-size: 36px; display: block; margin-bottom: 10px; opacity: 0.4; }
+
+    /* Toast */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      left: 24px;
+      background: var(--card2);
+      border: 1px solid var(--border);
+      border-right: 3px solid var(--gold);
+      color: var(--text);
+      padding: 12px 18px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: all 0.3s;
+      z-index: 999;
+      pointer-events: none;
+      max-width: 280px;
+    }
+    #toast.show { opacity: 1; transform: translateY(0); }
+  </style>
+</head>
+<body>
+
+<!-- Topbar -->
+<div class="topbar">
+  <div class="brand">
+    ✂ لوحة الحلاق
+    <span class="brand-badge">مباشر</span>
+  </div>
+  <div class="topbar-right">
+    <div class="stat-mini">
+      <div class="v" id="topWaiting">0</div>
+      <div class="l">بيستنوا</div>
+    </div>
+    <div class="stat-mini">
+      <div class="v" id="topDone" style="color:var(--green2)">0</div>
+      <div class="l">اتخدموا</div>
+    </div>
+    <span class="live-dot" title="اتصال مباشر"></span>
+    <a href="index.html" class="nav-link">صفحة العميل</a>
+    <a href="display.html" class="nav-link">شاشة العرض</a>
+  </div>
+</div>
+
+<div class="layout">
+
+  <!-- RIGHT SIDE (in RTL this renders first visually = left side content-wise) -->
+  <div>
+
+    <!-- Serving -->
+    <div class="serving-wrap">
+      <div class="sec-label">بيتخدم دلوقتي</div>
+      <div class="serving-card" id="servingCard">
+        <div id="servingInner">
+          <div class="empty">
+            <span class="ei">💈</span>
+            محدش بيتخدم دلوقتي<br>اضغط "الدور الجاي" تبدأ
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Next button -->
+    <div class="next-btn-wrap">
+      <button class="btn btn-gold btn-full btn-big" id="nextBtn" onclick="callNext()">
+        ▶ الدور الجاي
+      </button>
+    </div>
+
+    <!-- Queue list -->
+    <div class="sec-label">أدوار النهارده</div>
+    <div class="queue-card">
+      <div class="q-header">
+        <span>#</span>
+        <span>الاسم</span>
+        <span class="col-phone">التليفون</span>
+        <span>الحالة</span>
+      </div>
+      <div id="queueList">
+        <div class="empty"><span class="ei">📋</span>الدور فاضي</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+
+    <!-- Next up -->
+    <div class="side-card">
+      <h3>⏭ الجاي بعد كده</h3>
+      <div id="nextUpBox">
+        <div style="color:var(--muted);font-size:13px">محدش بيستنى</div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="side-card">
+      <h3>📊 إحصائيات النهارده</h3>
+      <div class="stats-grid">
+        <div class="stat-box">
+          <div class="sv" style="color:var(--gold)" id="s-total">0</div>
+          <div class="sl">الكل</div>
+        </div>
+        <div class="stat-box">
+          <div class="sv" style="color:var(--green2)" id="s-done">0</div>
+          <div class="sl">اتخدموا</div>
+        </div>
+        <div class="stat-box">
+          <div class="sv" style="color:var(--red2)" id="s-wait">0</div>
+          <div class="sl">بيستنوا</div>
+        </div>
+        <div class="stat-box">
+          <div class="sv" style="color:var(--amber)" id="s-skip">0</div>
+          <div class="sl">اتأجلوا</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Log -->
+    <div class="side-card">
+      <h3>📝 السجل</h3>
+      <div class="log-list" id="logList">
+        <div style="color:var(--muted);font-size:12px">مفيش نشاط لسه</div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="side-card">
+      <h3>⚙ إجراءات</h3>
+      <button class="btn btn-red btn-full" style="margin-bottom:8px" onclick="confirmReset()">
+        🔄 إعادة تعيين الأدوار
+      </button>
+      <button class="btn btn-ghost btn-full" onclick="loadQueue()">
+        ↻ تحديث
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="config.js"></script>
+<script>
+  const { createClient } = supabase;
+  const db = createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
+  const SHOP = SUPABASE_CONFIG.shopId;
+
+  let queueData = [];
+  let logItems  = [];
+
+  // ---- Load ----
+  async function loadQueue() {
+    const today = new Date().toISOString().split('T')[0];
+    const { data, error } = await db
+      .from('queue_entries')
+      .select('*')
+      .eq('shop_id', SHOP)
+      .gte('created_at', today + 'T00:00:00')
+      .order('queue_number', { ascending: true });
+
+    if (error) { console.error(error); return; }
+    queueData = data || [];
+    renderAll();
+  }
+
+  function renderAll() {
+    renderServing();
+    renderNextUp();
+    renderList();
+    renderStats();
+  }
+
+  // ---- Serving card ----
+  function renderServing() {
+    const s = queueData.find(e => e.status === 'serving');
+    const el = document.getElementById('servingInner');
+
+    if (!s) {
+      el.innerHTML = `<div class="empty"><span class="ei">💈</span>محدش بيتخدم دلوقتي<br>اضغط "الدور الجاي" تبدأ</div>`;
+      return;
+    }
+
+    el.innerHTML = `
+      <div class="sc-label">✂ بيتخدم دلوقتي — رقم ${s.queue_number}</div>
+      <div class="sc-name">${esc(s.customer_name)}</div>
+      <div class="sc-num">📱 ${esc(s.phone)} · دخل ${ago(s.created_at)}</div>
+      <div class="sc-actions">
+        <button class="btn btn-green btn-big" onclick="markDone('${s.id}')">✓ خلاص</button>
+        <button class="btn btn-amber" onclick="skipIt('${s.id}')">⤵ أجّل</button>
+      </div>
+    `;
+  }
+
+  // ---- Next up ----
+  function renderNextUp() {
+    const waiting = queueData.filter(e => e.status === 'waiting');
+    const el = document.getElementById('nextUpBox');
+    if (!waiting.length) {
+      el.innerHTML = '<div style="color:var(--muted);font-size:13px">محدش بيستنى</div>';
+      return;
+    }
+    const n = waiting[0];
+    el.innerHTML = `
+      <div class="next-num">#${n.queue_number}</div>
+      <div class="next-name">${esc(n.customer_name)}</div>
+      <div class="next-phone">${esc(n.phone)}</div>
+    `;
+  }
+
+  // ---- Queue rows ----
+  function renderList() {
+    const el = document.getElementById('queueList');
+    if (!queueData.length) {
+      el.innerHTML = '<div class="empty"><span class="ei">📋</span>الدور فاضي</div>';
+      return;
+    }
+
+    const statusMap = { waiting: 'بيستنى', serving: 'بيتخدم', done: 'خلص', skipped: 'اتأجل' };
+
+    el.innerHTML = queueData.map(e => `
+      <div class="q-row row-${e.status}">
+        <div class="q-num">${e.queue_number}</div>
+        <div class="q-name">${esc(e.customer_name)}</div>
+        <div class="q-phone col-phone">${esc(e.phone)}</div>
+        <div><span class="badge badge-${e.status}">${statusMap[e.status] || e.status}</span></div>
+      </div>
+    `).join('');
+  }
+
+  // ---- Stats ----
+  function renderStats() {
+    const c = { waiting: 0, serving: 0, done: 0, skipped: 0 };
+    queueData.forEach(e => c[e.status]++);
+    document.getElementById('topWaiting').textContent = c.waiting;
+    document.getElementById('topDone').textContent    = c.done;
+    document.getElementById('s-total').textContent   = queueData.length;
+    document.getElementById('s-done').textContent    = c.done;
+    document.getElementById('s-wait').textContent    = c.waiting;
+    document.getElementById('s-skip').textContent    = c.skipped;
+  }
+
+  // ---- Actions ----
+  async function callNext() {
+    const btn = document.getElementById('nextBtn');
+    btn.disabled = true;
+
+    try {
+      const serving = queueData.find(e => e.status === 'serving');
+      if (serving) {
+        await db.from('queue_entries').update({ status: 'done' }).eq('id', serving.id);
+        addLog(`رقم ${serving.queue_number} ${serving.customer_name} — خلص`);
+      }
+
+      const next = queueData.filter(e => e.status === 'waiting')[0];
+      if (!next) { toast('محدش بيستنى دلوقتي 🎉'); btn.disabled = false; return; }
+
+      await db.from('queue_entries').update({ status: 'serving' }).eq('id', next.id);
+      addLog(`بيتخدم دلوقتي: رقم ${next.queue_number} ${next.customer_name}`);
+
+      await triggerNotification('customer_serving', {
+        customer_name: next.customer_name, phone: next.phone,
+        queue_number: next.queue_number, shop_id: SHOP
+      });
+
+      const almostNext = queueData.filter(e => e.status === 'waiting')[1];
+      if (almostNext) {
+        await triggerNotification('customer_almost_next', {
+          customer_name: almostNext.customer_name, phone: almostNext.phone,
+          queue_number: almostNext.queue_number, shop_id: SHOP
+        });
+      }
+
+      toast(`✂ دور رقم ${next.queue_number} — ${next.customer_name}`);
+    } catch(e) {
+      toast('في مشكلة، حاول تاني');
+      console.error(e);
+    }
+    btn.disabled = false;
+  }
+
+  async function markDone(id) {
+    const e = queueData.find(x => x.id === id);
+    await db.from('queue_entries').update({ status: 'done' }).eq('id', id);
+    if (e) addLog(`رقم ${e.queue_number} ${e.customer_name} — خلص ✓`);
+    toast('تم التسجيل كـ "خلص" ✓');
+  }
+
+  async function skipIt(id) {
+    const e = queueData.find(x => x.id === id);
+    await db.from('queue_entries').update({ status: 'skipped' }).eq('id', id);
+    if (e) addLog(`رقم ${e.queue_number} ${e.customer_name} — اتأجل`);
+    await triggerNotification('customer_skipped', {
+      customer_name: e?.customer_name, phone: e?.phone,
+      queue_number: e?.queue_number, shop_id: SHOP
+    });
+    toast(`تم تأجيل رقم ${e?.queue_number}`);
+  }
+
+  function confirmReset() {
+    if (!confirm('إعادة تعيين أدوار النهارده؟ هيتم تسجيل الكل كـ "خلص"')) return;
+    resetQueue();
+  }
+
+  async function resetQueue() {
+    const today = new Date().toISOString().split('T')[0];
+    await db.from('queue_entries')
+      .update({ status: 'done' })
+      .eq('shop_id', SHOP)
+      .in('status', ['waiting', 'serving'])
+      .gte('created_at', today + 'T00:00:00');
+    addLog('تم إعادة تعيين الأدوار');
+    toast('تم الإعادة');
+  }
+
+  // ---- Log ----
+  function addLog(msg) {
+    logItems.unshift({ msg, time: new Date() });
+    if (logItems.length > 25) logItems.pop();
+    renderLog();
+  }
+
+  function renderLog() {
+    const el = document.getElementById('logList');
+    if (!logItems.length) {
+      el.innerHTML = '<div style="color:var(--muted);font-size:12px">مفيش نشاط لسه</div>';
+      return;
+    }
+    el.innerHTML = logItems.map(i => `
+      <div class="log-item">
+        <span class="lt">${esc(i.msg)}</span>
+        <span class="ltime">${ago(i.time)}</span>
+      </div>
+    `).join('');
+  }
+
+  // ---- Toast ----
+  let toastT;
+  function toast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastT);
+    toastT = setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  // ---- Helpers ----
+  function esc(s) {
+    return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function ago(d) {
+    const s = Math.floor((new Date() - new Date(d)) / 1000);
+    if (s < 60)  return 'دلوقتي';
+    if (s < 3600) return `${Math.floor(s/60)} دقيقة`;
+    return `${Math.floor(s/3600)} ساعة`;
+  }
+
+  // ---- Realtime ----
+  db.channel('q-dash')
+    .on('postgres_changes', {
+      event: '*', schema: 'public', table: 'queue_entries', filter: `shop_id=eq.${SHOP}`
+    }, payload => {
+      loadQueue();
+      if (payload.eventType === 'INSERT') {
+        addLog(`عميل جديد: رقم ${payload.new.queue_number} — ${payload.new.customer_name}`);
+        toast(`عميل جديد اتسجل: ${payload.new.customer_name} 🔔`);
+      }
+    })
+    .subscribe();
+
+  loadQueue();
+  setInterval(renderLog, 60000);
+</script>
+</body>
+</html>
