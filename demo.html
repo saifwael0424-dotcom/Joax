@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Joax — Live Demo</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #0A0A0F;
+  --ink2: #3A3A4A;
+  --muted: #7A7A90;
+  --border: #E8E8F0;
+  --bg: #F8F8FC;
+  --card: #ffffff;
+  --brand: #1A1AE6;
+  --brand-light: #EBEBFF;
+  --accent: #FF3D00;
+  --ok: #00A550;
+  --shadow-sm: 0 2px 12px rgba(10,10,15,0.06);
+  --shadow-md: 0 8px 40px rgba(10,10,15,0.10);
+  --shadow-lg: 0 24px 80px rgba(10,10,15,0.14);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Instrument Sans', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── LIVE BANNER ── */
+.live-banner {
+  background: var(--ink);
+  color: #fff;
+  text-align: center;
+  padding: 10px 20px;
+  font-size: 13px;
+  letter-spacing: 0.01em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.live-dot {
+  width: 8px; height: 8px;
+  background: #00FF88;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+  flex-shrink: 0;
+}
+@keyframes pulse {
+  0%,100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.3); }
+}
+.live-banner strong { color: #00FF88; }
+
+/* ── PROGRESS STEPS ── */
+.step-progress {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 28px 20px 0;
+  gap: 0;
+}
+.sp-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  position: relative;
+}
+.sp-num {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 600;
+  color: var(--muted);
+  background: var(--card);
+  transition: all .3s;
+  position: relative; z-index: 1;
+}
+.sp-num.active { border-color: var(--brand); background: var(--brand); color: #fff; }
+.sp-num.done { border-color: var(--ok); background: var(--ok); color: #fff; }
+.sp-label {
+  font-size: 11px;
+  color: var(--muted);
+  white-space: nowrap;
+  font-weight: 500;
+  transition: color .3s;
+}
+.sp-item.active .sp-label { color: var(--brand); }
+.sp-item.done .sp-label { color: var(--ok); }
+.sp-line {
+  width: 80px; height: 2px;
+  background: var(--border);
+  margin: 0 4px;
+  margin-bottom: 22px;
+  transition: background .3s;
+  flex-shrink: 0;
+}
+.sp-line.done { background: var(--ok); }
+
+/* ── MAIN WRAPPER ── */
+.demo-wrap {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 32px 20px 80px;
+}
+
+/* ── PHASE SECTIONS ── */
+.phase { display: none; }
+.phase.active {
+  display: block;
+  animation: fadeUp .4s cubic-bezier(.22,1,.36,1) both;
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── PITCH CARD ── */
+.pitch-card {
+  background: var(--ink);
+  color: #fff;
+  border-radius: 20px;
+  padding: 32px 36px;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+}
+.pitch-card::before {
+  content: '';
+  position: absolute;
+  top: -60px; right: -60px;
+  width: 200px; height: 200px;
+  background: radial-gradient(circle, rgba(26,26,230,0.4) 0%, transparent 70%);
+  pointer-events: none;
+}
+.pitch-card::after {
+  content: '';
+  position: absolute;
+  bottom: -40px; left: -40px;
+  width: 160px; height: 160px;
+  background: radial-gradient(circle, rgba(255,61,0,0.2) 0%, transparent 70%);
+  pointer-events: none;
+}
+.pitch-eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #00FF88;
+  margin-bottom: 10px;
+}
+.pitch-headline {
+  font-family: 'Instrument Serif', serif;
+  font-size: 28px;
+  line-height: 1.25;
+  margin-bottom: 12px;
+  color: #fff;
+}
+.pitch-headline em { font-style: italic; color: #A0A0FF; }
+.pitch-body {
+  font-size: 15px;
+  line-height: 1.7;
+  color: rgba(255,255,255,0.72);
+}
+.pitch-body strong { color: #fff; font-weight: 600; }
+
+/* ── FORM CARD ── */
+.form-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 28px 32px;
+  box-shadow: var(--shadow-sm);
+}
+.form-card-title {
+  font-family: 'Instrument Serif', serif;
+  font-size: 20px;
+  margin-bottom: 4px;
+}
+.form-card-sub {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+
+/* ── INPUTS ── */
+.fg { margin-bottom: 16px; }
+.fg label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink2);
+  margin-bottom: 6px;
+  letter-spacing: 0.01em;
+}
+.fg label .opt { font-weight: 400; color: var(--muted); }
+.iw { position: relative; }
+.iw .ico {
+  position: absolute; left: 13px; top: 50%;
+  transform: translateY(-50%); font-size: 15px;
+  pointer-events: none; opacity: .5; line-height: 1;
+}
+.iw input, .iw select {
+  width: 100%;
+  padding: 11px 14px 11px 40px;
+  border: 1.5px solid var(--border);
+  border-radius: 11px;
+  font-size: 15px;
+  font-family: 'Instrument Sans', system-ui, sans-serif;
+  color: var(--ink);
+  background: #fff;
+  transition: border-color .15s, box-shadow .15s;
+  -webkit-appearance: none; appearance: none;
+}
+.iw input::placeholder { color: #C8C8D8; }
+.iw input:focus, .iw select:focus {
+  outline: none;
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px rgba(26,26,230,.08);
+}
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+/* ── RATE EXPLAINER ── */
+.rate-preview {
+  background: var(--brand-light);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-top: 10px;
+  display: none;
+}
+.rate-preview.show { display: block; animation: fadeUp .3s both; }
+.rp-title { font-size: 11px; font-weight: 600; color: var(--brand); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 8px; }
+.rp-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+.rp-item { text-align: center; }
+.rp-val { font-size: 16px; font-weight: 700; color: var(--brand); }
+.rp-label { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+/* ── OPTION CARDS ── */
+.og { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.oc {
+  display: flex; align-items: center; gap: 10px;
+  padding: 11px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 11px;
+  cursor: pointer; font-size: 14px; color: var(--ink);
+  transition: all .15s; user-select: none; background: #fff;
+}
+.oc:hover { border-color: var(--brand); background: var(--brand-light); }
+.oc.sel { border-color: var(--brand); background: var(--brand-light); color: var(--brand); font-weight: 600; }
+.oc input { display: none; }
+.oc .oi { font-size: 18px; flex-shrink: 0; }
+.oc .otxt { flex: 1; line-height: 1.3; }
+.oc .otxt small { display: block; font-size: 11px; font-weight: 400; opacity: .65; margin-top: 1px; }
+.och { width: 18px; height: 18px; border: 2px solid var(--border); border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; margin-left: auto; transition: all .15s; }
+.oc.sel .och { border-color: var(--brand); background: var(--brand); }
+.oc.sel .och::after { content: ''; width: 6px; height: 6px; border-radius: 50%; background: #fff; }
+
+/* ── BUTTONS ── */
+.btn {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; padding: 14px;
+  border: none; border-radius: 12px;
+  font-size: 15px; font-weight: 600;
+  font-family: 'Instrument Sans', system-ui, sans-serif;
+  cursor: pointer; transition: all .15s;
+  letter-spacing: .01em; margin-top: 8px;
+}
+.btn:active { transform: scale(.99); }
+.btn-primary { background: var(--brand); color: #fff; }
+.btn-primary:hover { background: #0000CC; }
+.btn-primary:disabled { background: #C0C0D0; cursor: not-allowed; }
+.btn-back { background: none; border: 1.5px solid var(--border); color: var(--muted); margin-top: 8px; }
+.btn-back:hover { border-color: var(--brand); color: var(--brand); background: var(--brand-light); }
+
+/* ── QUOTE FORM (phase 2) ── */
+.quote-shell {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+.qf-header {
+  padding: 24px 28px 18px;
+  border-bottom: 1px solid var(--border);
+}
+.qf-badge {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 4px 12px 4px 4px;
+  background: var(--brand-light);
+  border-radius: 100px; margin-bottom: 12px;
+}
+.qf-av {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: var(--brand); display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700; color: #fff;
+}
+.qf-company { font-size: 13px; font-weight: 600; color: var(--brand); }
+.qf-title { font-family: 'Instrument Serif', serif; font-size: 22px; color: var(--ink); margin-bottom: 4px; }
+.qf-title em { font-style: italic; color: #6060CC; }
+.qf-sub { font-size: 13px; color: var(--muted); }
+.qf-trust { display: flex; gap: 16px; margin-top: 10px; flex-wrap: wrap; }
+.qf-trust span { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 4px; }
+
+.qf-body { padding: 24px 28px 28px; }
+.qstep { display: none; }
+.qstep.active { display: block; animation: fadeUp .25s both; }
+.qstep-title { font-family: 'Instrument Serif', serif; font-size: 18px; margin-bottom: 3px; }
+.qstep-sub { font-size: 13px; color: var(--muted); margin-bottom: 18px; line-height: 1.5; }
+
+/* ── LOADING ── */
+.loading-state {
+  display: none; text-align: center; padding: 3rem 0;
+}
+.ring {
+  width: 44px; height: 44px;
+  border: 3px solid var(--border);
+  border-top-color: var(--brand);
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+  margin: 0 auto 16px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── SUCCESS ── */
+.success-state { display: none; }
+.s-confetti {
+  text-align: center; font-size: 48px; margin-bottom: 8px;
+  animation: popIn .5s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes popIn { from{transform:scale(0);opacity:0} to{transform:scale(1);opacity:1} }
+.s-title {
+  font-family: 'Instrument Serif', serif;
+  font-size: 24px; text-align: center; margin-bottom: 4px;
+}
+.s-sub { font-size: 14px; color: var(--muted); text-align: center; margin-bottom: 20px; }
+
+.range-box {
+  background: linear-gradient(135deg, var(--brand) 0%, #5050FF 100%);
+  border-radius: 16px; padding: 22px 28px;
+  text-align: center; margin-bottom: 16px; color: #fff;
+}
+.range-box .rl { font-size: 13px; opacity: .75; margin-bottom: 5px; }
+.range-box .rv { font-family: 'Instrument Serif', serif; font-size: 38px; line-height: 1; }
+.range-box .rn { font-size: 12px; opacity: .6; margin-top: 6px; }
+
+.pills { display: flex; gap: 10px; margin-bottom: 16px; }
+.pill {
+  flex: 1; background: var(--bg); border-radius: 12px;
+  padding: 12px; text-align: center; border: 1px solid var(--border);
+}
+.pill .pv { font-size: 18px; font-weight: 700; color: var(--ink); }
+.pill .pl { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+.bdown { background: var(--bg); border-radius: 12px; padding: 14px 16px; margin-bottom: 14px; border: 1px solid var(--border); }
+.bdown-title { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 10px; }
+.brow { display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+.brow:last-child { border-bottom: none; }
+.brow .bl { color: var(--muted); }
+.brow .bv { font-weight: 600; color: var(--ink); }
+
+.email-note {
+  display: flex; align-items: center; gap: 8px;
+  padding: 12px 14px; background: #EEFFF5;
+  border: 1px solid #B3F0D0;
+  border-radius: 10px; font-size: 13px; color: var(--ok); margin-bottom: 16px;
+  font-weight: 500;
+}
+
+/* ── CTA PHASE ── */
+.cta-section { margin-top: 24px; }
+.cta-card {
+  background: var(--ink);
+  border-radius: 20px;
+  padding: 36px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.cta-card::before {
+  content: '';
+  position: absolute; top: -80px; left: 50%; transform: translateX(-50%);
+  width: 300px; height: 300px;
+  background: radial-gradient(circle, rgba(26,26,230,.5) 0%, transparent 70%);
+  pointer-events: none;
+}
+.cta-eyebrow { font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: #00FF88; margin-bottom: 12px; }
+.cta-headline { font-family: 'Instrument Serif', serif; font-size: 30px; color: #fff; line-height: 1.2; margin-bottom: 10px; }
+.cta-headline em { font-style: italic; color: #A0A0FF; }
+.cta-body { font-size: 15px; color: rgba(255,255,255,.65); line-height: 1.7; margin-bottom: 28px; max-width: 480px; margin-left: auto; margin-right: auto; }
+.cta-body strong { color: #fff; }
+
+.intake-form { display: none; }
+.intake-form.show { display: block; animation: fadeUp .3s both; }
+.intake-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+.intake-input {
+  width: 100%; padding: 12px 14px;
+  border: 1.5px solid rgba(255,255,255,.15);
+  border-radius: 10px; background: rgba(255,255,255,.08);
+  color: #fff; font-size: 14px;
+  font-family: 'Instrument Sans', system-ui, sans-serif;
+  transition: border-color .15s;
+}
+.intake-input::placeholder { color: rgba(255,255,255,.35); }
+.intake-input:focus { outline: none; border-color: rgba(255,255,255,.5); }
+.btn-cta {
+  width: 100%; padding: 15px;
+  background: #fff; color: var(--ink);
+  border: none; border-radius: 12px;
+  font-size: 15px; font-weight: 700;
+  font-family: 'Instrument Sans', system-ui, sans-serif;
+  cursor: pointer; transition: all .15s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  letter-spacing: .01em; margin-top: 10px;
+}
+.btn-cta:hover { background: #F0F0FF; transform: translateY(-1px); }
+.btn-cta:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+.btn-show-form {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 14px 28px;
+  background: #fff; color: var(--ink);
+  border: none; border-radius: 12px;
+  font-size: 15px; font-weight: 700;
+  font-family: 'Instrument Sans', system-ui, sans-serif;
+  cursor: pointer; transition: all .15s; letter-spacing: .01em;
+}
+.btn-show-form:hover { background: #F0F0FF; transform: translateY(-1px); }
+.intake-success { display: none; text-align: center; }
+.intake-success.show { display: block; animation: fadeUp .3s both; }
+.intake-success .big { font-size: 40px; margin-bottom: 8px; }
+.intake-success p { color: rgba(255,255,255,.7); font-size: 14px; line-height: 1.6; }
+.intake-success strong { color: #fff; }
+
+/* ── FERR ── */
+.ferr { font-size: 12px; color: var(--accent); margin-top: 4px; display: none; }
+
+/* ── MOBILE ── */
+@media(max-width:560px){
+  .pitch-card { padding: 24px 22px; }
+  .pitch-headline { font-size: 22px; }
+  .form-card { padding: 22px 20px; }
+  .qf-header { padding: 20px 20px 14px; }
+  .qf-body { padding: 20px 20px 24px; }
+  .row2 { grid-template-columns: 1fr; }
+  .og { grid-template-columns: 1fr; }
+  .intake-grid { grid-template-columns: 1fr; }
+  .sp-line { width: 40px; }
+  .cta-card { padding: 28px 20px; }
+  .cta-headline { font-size: 24px; }
+}
+</style>
+</head>
+<body>
+
+<!-- LIVE BANNER -->
+<div class="live-banner">
+  <div class="live-dot"></div>
+  You're on a <strong>live demo</strong> — everything here is real. The quote engine is connected right now.
+</div>
+
+<!-- STEP PROGRESS -->
+<div class="step-progress" id="step-progress">
+  <div class="sp-item active" id="spi-1"><div class="sp-num active" id="spn-1">1</div><div class="sp-label">Your rates</div></div>
+  <div class="sp-line" id="spl-1"></div>
+  <div class="sp-item" id="spi-2"><div class="sp-num" id="spn-2">2</div><div class="sp-label">Try it live</div></div>
+  <div class="sp-line" id="spl-2"></div>
+  <div class="sp-item" id="spi-3"><div class="sp-num" id="spn-3">3</div><div class="sp-label">Get set up</div></div>
+</div>
+
+<div class="demo-wrap">
+
+  <!-- ════════════════════════════════════════
+       PHASE 1 — CONFIGURE
+  ═══════════════════════════════════════════ -->
+  <div class="phase active" id="phase-1">
+
+    <div class="pitch-card">
+      <div class="pitch-eyebrow">Step 1 of 3 · 60 seconds</div>
+      <div class="pitch-headline">Right now, leads are calling you.<br>Are you <em>losing them</em> to the wait?</div>
+      <div class="pitch-body">
+        Most moving companies take <strong>24–48 hours</strong> to send a quote. By then, the customer has booked someone else.
+        Joax sends an <strong>instant, professional estimate</strong> the moment someone fills out your form — day or night, no one on your team has to do a thing.
+        <br><br>
+        Let's plug in your rates. Takes 60 seconds. Then you'll see exactly what your customers would experience.
+      </div>
+    </div>
+
+    <div class="form-card">
+      <div class="form-card-title">Your pricing, in 60 seconds</div>
+      <div class="form-card-sub">We'll use these to calculate a real quote — just like your system would.</div>
+
+      <div class="fg">
+        <label>Your company name</label>
+        <div class="iw"><span class="ico">🏢</span><input type="text" id="d-company" placeholder="e.g. Swift Movers LLC" oninput="updatePreview()"></div>
+      </div>
+
+      <div class="row2">
+        <div class="fg">
+          <label>2-mover rate (with truck)</label>
+          <div class="iw"><span class="ico">💲</span><input type="number" id="d-rate2" placeholder="e.g. 175" min="50" oninput="updateRatePreview()"></div>
+        </div>
+        <div class="fg">
+          <label>3-mover rate (with truck)</label>
+          <div class="iw"><span class="ico">💲</span><input type="number" id="d-rate3" placeholder="e.g. 225" min="50" oninput="updateRatePreview()"></div>
+        </div>
+      </div>
+
+      <div class="rate-preview" id="rate-preview">
+        <div class="rp-title">Auto-calculated rates</div>
+        <div class="rp-grid">
+          <div class="rp-item"><div class="rp-val" id="rp-2">—</div><div class="rp-label">2 movers/hr</div></div>
+          <div class="rp-item"><div class="rp-val" id="rp-3">—</div><div class="rp-label">3 movers/hr</div></div>
+          <div class="rp-item"><div class="rp-val" id="rp-4">—</div><div class="rp-label">4 movers/hr</div></div>
+        </div>
+      </div>
+
+      <div class="fg" style="margin-top:16px">
+        <label>Fuel / travel fee <span class="opt">(optional)</span></label>
+        <div class="iw"><span class="ico">⛽</span><input type="number" id="d-fuel" placeholder="e.g. 75" min="0"></div>
+      </div>
+
+      <div class="fg">
+        <label>Minimum hours</label>
+        <div class="iw"><span class="ico">⏱</span>
+          <select id="d-minhours">
+            <option value="2">2 hours minimum</option>
+            <option value="3">3 hours minimum</option>
+            <option value="4">4 hours minimum</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="ferr" id="err-config">Please enter your company name and at least the 2-mover rate.</div>
+
+      <button class="btn btn-primary" id="config-btn" onclick="finishConfig()">
+        <span>✨</span> Build my quote form →
+      </button>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       PHASE 2 — LIVE QUOTE FORM
+  ═══════════════════════════════════════════ -->
+  <div class="phase" id="phase-2">
+
+    <div class="pitch-card" style="margin-bottom:24px">
+      <div class="pitch-eyebrow">Step 2 of 3 · Try it yourself</div>
+      <div class="pitch-headline">This is what your<br>customers <em>actually see.</em></div>
+      <div class="pitch-body">
+        Go ahead — fill this out like you're a customer calling your company right now.
+        Use a real email address. <strong>You'll get an actual quote email in your inbox</strong> before you finish reading this sentence.
+        <br><br>
+        This form would live on your website, embedded in one line of code. Every single lead fills this out and gets an instant professional quote — <strong>automatically, 24/7, even while you sleep.</strong>
+      </div>
+    </div>
+
+    <!-- THE QUOTE FORM -->
+    <div class="quote-shell">
+      <div class="qf-header">
+        <div class="qf-badge">
+          <div class="qf-av" id="qf-av">JO</div>
+          <div class="qf-company" id="qf-company">Your Company</div>
+        </div>
+        <div class="qf-title">Get your <em>instant</em> moving estimate</div>
+        <div class="qf-sub">Takes 2 minutes · No commitment · Sent straight to your inbox</div>
+        <div class="qf-trust">
+          <span>✅ Free quote</span>
+          <span>🔒 Private &amp; secure</span>
+          <span>⚡ Instant results</span>
+        </div>
+      </div>
+
+      <div class="qf-body">
+
+        <!-- Q STEP 1 -->
+        <div class="qstep active" id="qs-1">
+          <div class="qstep-title">Let's start with you</div>
+          <div class="qstep-sub">We'll send your full breakdown straight to your inbox.</div>
+
+          <div class="row2">
+            <div class="fg">
+              <label>Full name</label>
+              <div class="iw"><span class="ico">👤</span><input type="text" id="q-name" placeholder="John Smith" autocomplete="name"></div>
+            </div>
+            <div class="fg">
+              <label>Phone <span class="opt">(optional)</span></label>
+              <div class="iw"><span class="ico">📞</span><input type="tel" id="q-phone" placeholder="+1 (555) 000-0000"></div>
+            </div>
+          </div>
+
+          <div class="fg">
+            <label>Email address <span style="color:#DC2626">*</span></label>
+            <div class="iw" id="iw-email"><span class="ico">✉️</span><input type="email" id="q-email" placeholder="john@email.com"></div>
+            <div class="ferr" id="err-email">Please enter a valid email.</div>
+          </div>
+
+          <div class="fg">
+            <label>Moving from</label>
+            <div class="iw"><span class="ico">📍</span><input type="text" id="q-from" placeholder="123 Main St, City, State"></div>
+          </div>
+          <div class="fg">
+            <label>Moving to</label>
+            <div class="iw"><span class="ico">🏠</span><input type="text" id="q-to" placeholder="456 Oak Ave, City, State"></div>
+          </div>
+
+          <button class="btn btn-primary" onclick="qNext(1)">Continue →</button>
+        </div>
+
+        <!-- Q STEP 2 -->
+        <div class="qstep" id="qs-2">
+          <div class="qstep-title">How big is your move?</div>
+          <div class="qstep-sub">Pick the option that best fits your home.</div>
+
+          <div class="fg">
+            <label>Home size <span style="color:#DC2626">*</span></label>
+            <div class="og">
+              <div class="oc" onclick="qSel(this,'beds','1')"><span class="oi">🛏</span><div class="otxt">Studio / 1 bed<small>Up to ~500 sq ft</small></div><input type="radio" name="beds" value="1"><div class="och"></div></div>
+              <div class="oc" onclick="qSel(this,'beds','2')"><span class="oi">🛏</span><div class="otxt">2 bedrooms<small>~800–1100 sq ft</small></div><input type="radio" name="beds" value="2"><div class="och"></div></div>
+              <div class="oc" onclick="qSel(this,'beds','3')"><span class="oi">🛏</span><div class="otxt">3 bedrooms<small>~1100–1600 sq ft</small></div><input type="radio" name="beds" value="3"><div class="och"></div></div>
+              <div class="oc" onclick="qSel(this,'beds','4')"><span class="oi">🏡</span><div class="otxt">4+ bedrooms<small>Large home</small></div><input type="radio" name="beds" value="4"><div class="och"></div></div>
+            </div>
+            <div class="ferr" id="err-beds">Please select your home size.</div>
+          </div>
+
+          <div class="fg">
+            <label>Flights of stairs</label>
+            <div class="iw"><span class="ico">🪜</span>
+              <select id="q-flights">
+                <option value="0">No stairs</option>
+                <option value="1">1 flight</option>
+                <option value="2">2 flights</option>
+                <option value="3">3 flights</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="fg">
+            <label>Do you need a truck?</label>
+            <div class="og">
+              <div class="oc sel" onclick="qSel(this,'truck','true')"><span class="oi">🚛</span><div class="otxt">Yes, include a truck<small>Full-service move</small></div><input type="radio" name="truck" value="true" checked><div class="och" style="border-color:var(--brand);background:var(--brand)"><span style="width:6px;height:6px;border-radius:50%;background:#fff;display:block"></span></div></div>
+              <div class="oc" onclick="qSel(this,'truck','false')"><span class="oi">💪</span><div class="otxt">Labor only<small>I have my own truck</small></div><input type="radio" name="truck" value="false"><div class="och"></div></div>
+            </div>
+          </div>
+
+          <div class="fg">
+            <label>Move date <span class="opt">(optional)</span></label>
+            <div class="iw"><span class="ico">📅</span><input type="date" id="q-date"></div>
+          </div>
+
+          <button class="btn btn-primary" onclick="qNext(2)">Continue →</button>
+          <button class="btn btn-back" onclick="qPrev(2)">← Back</button>
+        </div>
+
+        <!-- Q LOADING -->
+        <div class="loading-state" id="q-loading">
+          <div class="ring"></div>
+          <div style="font-size:15px;color:var(--muted);margin-bottom:6px">Calculating your estimate…</div>
+          <div style="font-size:13px;color:#C0C0D0">Crunching the numbers right now</div>
+        </div>
+
+        <!-- Q SUCCESS -->
+        <div class="success-state" id="q-success">
+          <div class="s-confetti">🎉</div>
+          <div class="s-title" id="s-company-title">Your estimate is ready</div>
+          <div class="s-sub">Here's your personalised moving quote</div>
+
+          <div class="range-box">
+            <div class="rl">Estimated price range</div>
+            <div class="rv" id="s-range">—</div>
+            <div class="rn">Final price depends on actual move duration</div>
+          </div>
+
+          <div class="pills">
+            <div class="pill"><div class="pv" id="s-crew">—</div><div class="pl">Movers</div></div>
+            <div class="pill"><div class="pv" id="s-hrs">—</div><div class="pl">Est. hours</div></div>
+            <div class="pill" id="s-rate-pill" style="display:none"><div class="pv" id="s-rate">—</div><div class="pl">Per hour</div></div>
+          </div>
+
+          <div class="bdown">
+            <div class="bdown-title">Price breakdown</div>
+            <div id="s-rows"></div>
+          </div>
+
+          <div class="email-note">
+            📬 That email just landed in your inbox — automatically. No one on your team did a thing.
+          </div>
+
+          <button class="btn btn-primary" onclick="goPhase3()" style="background:var(--ok)">
+            See what happens next →
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       PHASE 3 — CTA
+  ═══════════════════════════════════════════ -->
+  <div class="phase" id="phase-3">
+
+    <div class="pitch-card" style="margin-bottom:24px">
+      <div class="pitch-eyebrow">Step 3 of 3 · The close</div>
+      <div class="pitch-headline">That just happened in<br><em>under 10 seconds.</em></div>
+      <div class="pitch-body">
+        A customer landed on your website. They filled out the form. <strong>Before they even closed the tab, a professional quote was already in their inbox.</strong>
+        <br><br>
+        No spreadsheets. No callbacks. No "I'll get back to you." Just an instant, professional quote with your company name on it — every single time, around the clock.
+        <br><br>
+        Your competitors are still doing this manually. <strong>How many leads are slipping through while you sleep?</strong>
+      </div>
+    </div>
+
+    <div class="cta-card">
+      <div class="cta-eyebrow">Ready to go live?</div>
+      <div class="cta-headline">Get this running for your<br>business <em>today.</em></div>
+      <div class="cta-body">
+        Leave your details below. We'll set up your account, configure your pricing, and have your form live on your website — <strong>in one call.</strong>
+      </div>
+
+      <div id="intake-wrap">
+        <div class="btn-show-form-wrap" id="show-intake-wrap">
+          <button class="btn-show-form" onclick="showIntake()">
+            <span>🚀</span> Set this up for my business
+          </button>
+        </div>
+
+        <div class="intake-form" id="intake-form">
+          <div class="intake-grid">
+            <input type="text" class="intake-input" id="i-name" placeholder="Your name">
+            <input type="text" class="intake-input" id="i-company" placeholder="Company name">
+            <input type="email" class="intake-input" id="i-email" placeholder="Email address">
+            <input type="tel" class="intake-input" id="i-phone" placeholder="Phone number">
+          </div>
+          <button class="btn-cta" id="intake-btn" onclick="submitIntake()">
+            <span>⚡</span> I want this for my business
+          </button>
+          <div style="font-size:12px;color:rgba(255,255,255,.4);margin-top:10px">
+            We'll reach out within the hour. No spam, no pressure.
+          </div>
+        </div>
+
+        <div class="intake-success" id="intake-success">
+          <div class="big">🙌</div>
+          <p>
+            <strong>You're on the list.</strong><br>
+            Our team will call you within the hour to get your account set up.<br>
+            Check your email — we just sent you a confirmation.
+          </p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div><!-- /demo-wrap -->
+
+<script>
+const API_URL     = 'https://n8n.srv1058135.hstgr.cloud/webhook';
+const CLIENT_SLUG = 'demo';            // your demo account slug in Supabase
+const DEMO_CLIENT_ID = 'DEMO_CLIENT_UUID_HERE'; // replace with actual demo client_id from Supabase
+
+// State
+let demoConfig = {};
+let qFormData  = {};
+
+// ── RATE PREVIEW ───────────────────────────────────────────────────
+function updateRatePreview() {
+  const r2 = parseFloat(document.getElementById('d-rate2').value) || 0;
+  const r3 = parseFloat(document.getElementById('d-rate3').value) || 0;
+  if (!r2 && !r3) { document.getElementById('rate-preview').classList.remove('show'); return; }
+  const r4 = r3 ? Math.round(r3 * 1.2 / 5) * 5 : Math.round(r2 * 1.4 / 5) * 5;
+  document.getElementById('rp-2').textContent = r2 ? '$'+r2 : '—';
+  document.getElementById('rp-3').textContent = r3 ? '$'+r3 : '—';
+  document.getElementById('rp-4').textContent = r4 ? '$'+r4 : '—';
+  document.getElementById('rate-preview').classList.add('show');
+}
+
+function updatePreview() {
+  // Live preview of company name in the form header
+  const name = document.getElementById('d-company').value.trim() || 'Your Company';
+  document.getElementById('qf-company').textContent = name;
+  const words = name.split(' ');
+  const initials = words.length >= 2 ? words[0][0]+words[1][0] : name.slice(0,2);
+  document.getElementById('qf-av').textContent = initials.toUpperCase();
+}
+
+// ── FINISH CONFIG ──────────────────────────────────────────────────
+function finishConfig() {
+  const company = document.getElementById('d-company').value.trim();
+  const rate2   = parseFloat(document.getElementById('d-rate2').value) || 0;
+  const err = document.getElementById('err-config');
+
+  if (!company || !rate2) {
+    err.style.display = 'block';
+    return;
+  }
+  err.style.display = 'none';
+
+  const rate3 = parseFloat(document.getElementById('d-rate3').value) || Math.round(rate2 * 1.28 / 5) * 5;
+  const rate4 = Math.round(rate3 * 1.2 / 5) * 5;
+
+  demoConfig = {
+    company_name: company,
+    rates_with_truck: { 2: rate2, 3: rate3, 4: rate4 },
+    rates_without_truck: { 2: Math.round(rate2*.6/5)*5, 3: Math.round(rate3*.6/5)*5 },
+    base_hours: { 1:3, 2:5, 3:7, 4:9, 5:11 },
+    stairs_addon: { 1:.25, 2:.5, 3:.75, 4:1, 5:1.25 },
+    protection_plan: { 1:110, 2:155, 3:225, 4:290, 5:335 },
+    minimum_hours: parseInt(document.getElementById('d-minhours').value) || 2,
+    fuel_fee: parseFloat(document.getElementById('d-fuel').value) || 0,
+    range_low_pct: 0.9,
+    range_high_pct: 1.18,
+    cancellation_fee: 0,
+  };
+
+  // Update form branding
+  updatePreview();
+
+  goPhase(2);
+}
+
+// ── PHASE NAVIGATION ───────────────────────────────────────────────
+function goPhase(n) {
+  document.querySelectorAll('.phase').forEach(p => p.classList.remove('active'));
+  document.getElementById('phase-'+n).classList.add('active');
+  updateStepProgress(n);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function goPhase3() { goPhase(3); }
+
+function updateStepProgress(n) {
+  for (let i = 1; i <= 3; i++) {
+    const num = document.getElementById('spn-'+i);
+    const item = document.getElementById('spi-'+i);
+    if (!num) continue;
+    num.className = 'sp-num';
+    item.className = 'sp-item';
+    if (i < n)      { num.className += ' done'; num.textContent = '✓'; item.className += ' done'; }
+    else if (i===n) { num.className += ' active'; num.textContent = i; item.className += ' active'; }
+    else            { num.textContent = i; }
+    if (i < 3) {
+      const line = document.getElementById('spl-'+i);
+      if (line) line.className = 'sp-line' + (i < n ? ' done' : '');
+    }
+  }
+}
+
+// ── QUOTE FORM NAVIGATION ──────────────────────────────────────────
+function showQStep(n) {
+  document.querySelectorAll('.qstep').forEach(s => s.classList.remove('active'));
+  document.getElementById('q-loading').style.display = 'none';
+  document.getElementById('q-success').style.display = 'none';
+  const el = document.getElementById('qs-'+n);
+  if (el) el.classList.add('active');
+}
+
+function qNext(from) {
+  if (!qValidate(from)) return;
+  qCollect(from);
+  if (from === 2) { submitQuote(); return; }
+  showQStep(from + 1);
+}
+function qPrev(from) { showQStep(from - 1); }
+
+function qValidate(step) {
+  let ok = true;
+  if (step === 1) {
+    const em = document.getElementById('q-email').value.trim();
+    const eok = em && em.includes('@') && em.includes('.');
+    const iw = document.getElementById('iw-email');
+    const er = document.getElementById('err-email');
+    iw.style.borderColor = eok ? '' : '#DC2626';
+    er.style.display = eok ? 'none' : 'block';
+    if (!eok) ok = false;
+  }
+  if (step === 2) {
+    const b = document.querySelector('input[name=beds]:checked');
+    const er = document.getElementById('err-beds');
+    er.style.display = b ? 'none' : 'block';
+    if (!b) ok = false;
+  }
+  return ok;
+}
+
+function qCollect(step) {
+  if (step === 1) {
+    qFormData.name  = document.getElementById('q-name').value.trim();
+    qFormData.email = document.getElementById('q-email').value.trim();
+    qFormData.phone = document.getElementById('q-phone').value.trim();
+    qFormData.address_from = document.getElementById('q-from').value.trim();
+    qFormData.address_to   = document.getElementById('q-to').value.trim();
+  }
+  if (step === 2) {
+    qFormData.bedrooms  = parseInt(document.querySelector('input[name=beds]:checked').value);
+    qFormData.flights   = parseInt(document.getElementById('q-flights').value) || 0;
+    qFormData.truck     = document.querySelector('input[name=truck]:checked')?.value === 'true';
+    qFormData.move_date = document.getElementById('q-date').value;
+    if (qFormData.move_date) {
+      const d = new Date(qFormData.move_date + 'T12:00:00');
+      qFormData.is_weekend = d.getDay() === 0 || d.getDay() === 6;
+    }
+  }
+}
+
+function qSel(el, name, value) {
+  document.querySelectorAll('.oc').forEach(o => {
+    if (o.querySelector(`input[name="${name}"]`)) {
+      o.classList.remove('sel');
+      const inp = o.querySelector(`input[name="${name}"]`);
+      if (inp) inp.checked = false;
+      // reset och
+      const och = o.querySelector('.och');
+      if (och) { och.style.borderColor=''; och.style.background=''; och.innerHTML=''; }
+    }
+  });
+  el.classList.add('sel');
+  const inp = el.querySelector(`input[name="${name}"]`);
+  if (inp) inp.checked = true;
+  if (name === 'beds') document.getElementById('err-beds').style.display = 'none';
+}
+
+// ── SUBMIT QUOTE ───────────────────────────────────────────────────
+async function submitQuote() {
+  document.querySelectorAll('.qstep').forEach(s => s.classList.remove('active'));
+  document.getElementById('q-loading').style.display = 'block';
+  document.getElementById('q-success').style.display = 'none';
+
+  // Calculate immediately in browser using the demo config they just entered
+  // This is instant and reliable — no waiting on the webhook for the price display
+  const localResult = calcLocal();
+
+  // Fire the real webhook in the background to send the email
+  // We don't wait for it — the price shows instantly
+  const payload = {
+    ...qFormData,
+    client_slug: CLIENT_SLUG,
+    demo_config: demoConfig,
+    company_name: demoConfig.company_name,
+    heavy_items: [],
+    packing_boxes: 0,
+    has_elevator: false,
+    long_carry: false,
+    // Pass pre-calculated result so the workflow can use it directly for the email
+    pre_calculated: localResult,
+  };
+
+  fetch(`${API_URL}/quote`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  }).catch(() => {}); // silent fail — email is bonus, not blocking
+
+  // Small delay to make it feel like it's "calculating"
+  await new Promise(r => setTimeout(r, 1800));
+
+  renderSuccess(localResult);
+}
+
+// ── LOCAL CALCULATION (instant, uses demo config) ──────────────────
+function calcLocal() {
+  const c = demoConfig;
+  const beds    = qFormData.bedrooms || 2;
+  const flights = qFormData.flights  || 0;
+  const truck   = qFormData.truck !== false;
+
+  const bedsKey    = Math.min(beds, 5);
+  const flightsKey = Math.min(flights, 5);
+
+  const baseHoursMap = c.base_hours || { 1:3, 2:5, 3:7, 4:9, 5:11 };
+  const stairsMap    = c.stairs_addon || { 1:.25, 2:.5, 3:.75, 4:1, 5:1.25 };
+
+  const baseHours = parseFloat(baseHoursMap[bedsKey] || baseHoursMap[5] || 6);
+  const stairsAdd = parseFloat(stairsMap[flightsKey] || 0);
+  const hours     = Math.max(baseHours + stairsAdd, c.minimum_hours || 2);
+
+  const rateTable = truck
+    ? (c.rates_with_truck    || { 2:175, 3:225, 4:275 })
+    : (c.rates_without_truck || { 2:100, 3:150, 4:200 });
+
+  // Pick movers based on bedroom count
+  const moverMap = { 1:2, 2:2, 3:3, 4:4, 5:4 };
+  const movers   = moverMap[bedsKey] || 2;
+  const rate     = parseFloat(rateTable[movers] || rateTable[2] || 150);
+
+  const labor      = Math.round(hours * rate);
+  const protMap    = c.protection_plan || { 1:110, 2:155, 3:225, 4:290, 5:335 };
+  const protection = parseFloat(protMap[bedsKey] || protMap[5] || 0);
+  const fuel       = parseFloat(c.fuel_fee) || 0;
+
+  const lineItems = [{ label: 'Labor', amount: labor }];
+  if (protection > 0) lineItems.push({ label: 'Protection plan', amount: protection });
+  if (fuel > 0)       lineItems.push({ label: 'Fuel / travel fee', amount: fuel });
+
+  const subtotal = lineItems.reduce((s, i) => s + i.amount, 0);
+  const low      = Math.round(subtotal * (c.range_low_pct  || 0.9));
+  const high     = Math.round(subtotal * (c.range_high_pct || 1.18));
+
+  return {
+    low, high, subtotal,
+    movers, hours: parseFloat(hours.toFixed(1)), rate,
+    lineItems,
+    company_name: c.company_name || '',
+  };
+}
+
+// ── RENDER SUCCESS ─────────────────────────────────────────────────
+function renderSuccess(r) {
+  document.getElementById('q-loading').style.display = 'none';
+  document.getElementById('q-success').style.display = 'block';
+
+  document.getElementById('s-company-title').textContent =
+    (r.company_name || demoConfig.company_name || 'Your') + ' Moving Estimate';
+  document.getElementById('s-range').textContent =
+    '$'+(r.low||0).toLocaleString()+' – $'+(r.high||0).toLocaleString();
+  document.getElementById('s-crew').textContent = r.movers || '—';
+  document.getElementById('s-hrs').textContent  = r.hours ? r.hours+' hrs' : '—';
+
+  if (r.rate) {
+    document.getElementById('s-rate-pill').style.display = 'block';
+    document.getElementById('s-rate').textContent = '$'+r.rate+'/hr';
+  }
+
+  document.getElementById('s-rows').innerHTML =
+    (r.lineItems||[]).filter(i=>i.amount!==0).map(i=>`
+      <div class="brow">
+        <span class="bl">${i.label}</span>
+        <span class="bv">${i.amount<0?'-$'+Math.abs(i.amount).toLocaleString():'$'+i.amount.toLocaleString()}</span>
+      </div>`).join('');
+}
+
+// ── INTAKE FORM ────────────────────────────────────────────────────
+function showIntake() {
+  document.getElementById('show-intake-wrap').style.display = 'none';
+  document.getElementById('intake-form').classList.add('show');
+  document.getElementById('i-company').value = demoConfig.company_name || '';
+}
+
+async function submitIntake() {
+  const name    = document.getElementById('i-name').value.trim();
+  const company = document.getElementById('i-company').value.trim();
+  const email   = document.getElementById('i-email').value.trim();
+  const phone   = document.getElementById('i-phone').value.trim();
+
+  if (!name || !email) {
+    document.getElementById('i-name').style.borderColor = name ? '' : 'rgba(255,100,100,.6)';
+    document.getElementById('i-email').style.borderColor = email ? '' : 'rgba(255,100,100,.6)';
+    return;
+  }
+
+  const btn = document.getElementById('intake-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span>⏳</span> Submitting…';
+
+  try {
+    // Save lead to Supabase via n8n or direct
+    await fetch(`${API_URL}/demo-lead`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name, company, email, phone,
+        demo_config: demoConfig,
+        source: 'demo_page',
+        submitted_at: new Date().toISOString(),
+      })
+    });
+  } catch(e) {}
+
+  document.getElementById('intake-form').classList.remove('show');
+  document.getElementById('intake-success').classList.add('show');
+}
+
+// ── INIT ───────────────────────────────────────────────────────────
+// Pre-fill demo company name from URL param if provided
+// e.g. demo.html?company=Swift+Movers
+const urlParams = new URLSearchParams(window.location.search);
+const preCompany = urlParams.get('company');
+if (preCompany) {
+  document.getElementById('d-company').value = preCompany;
+  updatePreview();
+}
+</script>
+</body>
+</html>
