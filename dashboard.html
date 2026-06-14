@@ -223,13 +223,13 @@ tr:hover td{background:#fafafa}
     <div class="auth-logo">joax<span>.</span>online</div>
     <div class="form-group">
       <label>Email</label>
-      <input type="email" id="login-email" placeholder="you@company.com">
+      <input type="email" id="login-email" placeholder="you@company.com" onkeydown="if(event.key==='Enter')login()">
     </div>
     <div class="form-group">
       <label>Password</label>
-      <input type="password" id="login-password" placeholder="••••••••">
+      <input type="password" id="login-password" placeholder="••••••••" onkeydown="if(event.key==='Enter')login()">
     </div>
-    <button class="btn-primary" onclick="login()">Sign in</button>
+    <button class="btn-primary" id="login-btn" onclick="login()">Sign in</button>
     <div class="auth-error hidden" id="auth-error"></div>
   </div>
 </div>
@@ -617,6 +617,12 @@ tr:hover td{background:#fafafa}
     <div class="page" id="page-leads">
       <div class="page-title">Leads</div>
       <div class="page-sub">Everyone who requested a quote</div>
+
+      <div id="leads-client-switcher" style="display:none;align-items:center;gap:10px;margin-bottom:14px;padding:10px 14px;background:#fff;border:1px solid #e5e5e5;border-radius:10px;flex-wrap:wrap">
+        <div class="avatar" id="leads-av">?</div>
+        <label style="font-size:13px;color:#666;white-space:nowrap">Viewing leads for:</label>
+        <select id="leads-client-select" onchange="switchLeadsClient()" style="flex:1;min-width:140px;padding:6px 10px;font-size:13px;border:1px solid #ddd;border-radius:6px;background:#fff"></select>
+      </div>
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">
         <input type="text" id="leads-search" placeholder="Search by name, email, phone..." oninput="searchLeads()" style="flex:1;min-width:200px;padding:8px 12px;font-size:13px;border:1px solid #ddd;border-radius:8px">
         <span style="font-size:13px;color:#888" id="leads-count"></span>
@@ -721,7 +727,7 @@ tr:hover td{background:#fafafa}
   </div>
 </div>
 
-<div class="save-bar">
+<div class="save-bar hidden" id="save-bar">
   <span class="save-status" id="save-status">No unsaved changes</span>
   <div class="btn-row">
     <button class="btn-ghost" onclick="loadConfig()">Discard</button>
@@ -752,24 +758,39 @@ async function init() {
 }
 
 async function login() {
-  const email = document.getElementById('login-email').value;
+  const email = document.getElementById('login-email').value.trim();
   const pass = document.getElementById('login-password').value;
   const err = document.getElementById('auth-error');
+  const btn = document.getElementById('login-btn');
+
+  if (!email || !pass) {
+    err.textContent = 'Please enter your email and password.';
+    err.classList.remove('hidden');
+    return;
+  }
+
   err.classList.add('hidden');
-  const { error } = await sb.auth.signInWithPassword({ email, password: pass });
+  btn.textContent = 'Signing in…';
+  btn.disabled = true;
+
+  const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+
   if (error) {
     err.textContent = error.message;
     err.classList.remove('hidden');
-  } else {
-    const { data: { user } } = await sb.auth.getUser();
-    currentUser = user;
-    await setupDashboard();
+    btn.textContent = 'Sign in';
+    btn.disabled = false;
+    return;
   }
+
+  currentUser = data.user;
+  await setupDashboard();
 }
 
 async function setupDashboard() {
   document.getElementById('auth-page').classList.add('hidden');
   document.getElementById('dashboard').classList.remove('hidden');
+  document.getElementById('save-bar').classList.remove('hidden');
   document.getElementById('nav-email').textContent = currentUser.email;
 
   const { data: clientRow } = await sb.from('clients').select('*').eq('user_id', currentUser.id).single();
@@ -1311,12 +1332,49 @@ function renderActivityTable(quotes) {
 // ---- LEADS ----
 async function loadLeads() {
   if (!currentClient) return;
-  let query = sb.from('quotes').select('*').order('created_at', { ascending: false }).limit(100);
-  if (!isAdmin) query = query.eq('client_id', currentClient.id);
-  const { data: quotes } = await query;
+  // Always filter by the currently selected client — for admin this is the dropdown selection
+  const { data: quotes } = await sb.from('quotes')
+    .select('*')
+    .eq('client_id', currentClient.id)
+    .order('created_at', { ascending: false })
+    .limit(200);
   if (!quotes) return;
   window._allLeads = quotes;
+
+  // If admin, show a client switcher above the table
+  const switcherEl = document.getElementById('leads-client-switcher');
+  if (switcherEl) {
+    if (isAdmin) {
+      switcherEl.style.display = 'flex';
+      const sel = document.getElementById('leads-client-select');
+      if (sel && sel.options.length === 0) {
+        allClients.forEach(c => {
+          const opt = document.createElement('option');
+          opt.value = c.id; opt.textContent = c.company_name;
+          sel.appendChild(opt);
+        });
+      }
+      if (sel) sel.value = currentClient.id;
+    } else {
+      switcherEl.style.display = 'none';
+    }
+  }
+
   renderLeads(quotes);
+}
+
+async function switchLeadsClient() {
+  const id = document.getElementById('leads-client-select').value;
+  currentClient = allClients.find(c => c.id === id);
+  updateAvatar();
+  // Update leads avatar
+  if (currentClient) {
+    const words = currentClient.company_name.split(' ');
+    const initials = words.length >= 2 ? words[0][0]+words[1][0] : words[0].slice(0,2);
+    const avEl = document.getElementById('leads-av');
+    if (avEl) avEl.textContent = initials.toUpperCase();
+  }
+  await loadLeads();
 }
 
 function renderLeads(quotes) {
