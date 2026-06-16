@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Get an Instant Quote</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root {
+  --brand:#3D35A8; --brand-light:#EEEDFE; --brand-mid:#6C63E0;
+  --accent:#FF6B35; --text:#0F0E1A; --muted:#6B6B80;
+  --border:#E4E4EF; --bg:#F7F7FC; --card:#fff;
+  --ok:#16A34A; --err:#DC2626;
+  --shadow:0 4px 40px rgba(61,53,168,0.12);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px 16px;overflow-x:hidden}
+body::before{content:'';position:fixed;top:-200px;right:-200px;width:600px;height:600px;background:radial-gradient(circle,rgba(108,99,224,.13) 0%,transparent 70%);pointer-events:none}
+body::after{content:'';position:fixed;bottom:-150px;left:-150px;width:500px;height:500px;background:radial-gradient(circle,rgba(255,107,53,.07) 0%,transparent 70%);pointer-events:none}
+
+.card{background:var(--card);border-radius:22px;width:100%;max-width:520px;box-shadow:var(--shadow);overflow:hidden;animation:cardIn .4s cubic-bezier(.34,1.56,.64,1) both}
+@keyframes cardIn{from{opacity:0;transform:translateY(20px) scale(.97)}to{opacity:1;transform:none}}
+
+/* ── HEADER ── */
+.card-header{padding:26px 30px 18px;border-bottom:1px solid var(--border)}
+.company-badge{display:inline-flex;align-items:center;gap:8px;padding:5px 14px 5px 5px;background:var(--brand-light);border-radius:100px;margin-bottom:14px}
+.company-avatar{width:28px;height:28px;background:var(--brand);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
+.company-name-badge{font-size:13px;font-weight:600;color:var(--brand)}
+.header-title{font-family:'DM Serif Display',serif;font-size:25px;color:var(--text);line-height:1.2;margin-bottom:5px}
+.header-title em{font-style:italic;color:var(--brand-mid)}
+.header-sub{font-size:13px;color:var(--muted);line-height:1.5}
+.trust-row{display:flex;gap:16px;margin-top:12px;flex-wrap:wrap}
+.trust-item{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--muted)}
+
+/* ── PROGRESS ── */
+.progress-wrap{display:flex;align-items:center;padding:14px 30px 0;gap:0}
+.pstep{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;position:relative}
+.pstep:last-child{flex:0}
+.pnum{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;border:2px solid var(--border);color:var(--muted);background:var(--card);transition:all .25s;position:relative;z-index:1}
+.pnum.active{border-color:var(--brand);background:var(--brand);color:#fff}
+.pnum.done{border-color:var(--brand);background:var(--brand-light);color:var(--brand)}
+.pline{flex:1;height:2px;background:var(--border);border-radius:2px;transition:background .25s;margin:0 4px;margin-bottom:14px}
+.pline.done{background:var(--brand)}
+.plabel{font-size:10px;color:var(--muted);white-space:nowrap;transition:color .2s}
+.pnum.active ~ .plabel, .plabel.active{color:var(--brand);font-weight:600}
+
+/* ── BODY ── */
+.card-body{padding:22px 30px 26px;min-height:300px}
+.step{display:none}
+.step.active{display:block;animation:stepIn .22s ease both}
+@keyframes stepIn{from{opacity:0;transform:translateX(10px)}to{opacity:1;transform:none}}
+.step-title{font-family:'DM Serif Display',serif;font-size:20px;color:var(--text);margin-bottom:3px}
+.step-sub{font-size:13px;color:var(--muted);margin-bottom:18px;line-height:1.5}
+
+/* ── FORM ELEMENTS ── */
+.fg{margin-bottom:14px}
+.fg label{display:block;font-size:13px;font-weight:500;color:var(--text);margin-bottom:6px}
+.fg label .opt{font-weight:400;color:var(--muted)}
+.req{color:var(--err);margin-left:2px}
+.iw{position:relative}
+.iw .ico{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:15px;pointer-events:none;opacity:.55;line-height:1}
+.iw input,.iw select,.iw textarea{width:100%;padding:10px 12px 10px 36px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:'DM Sans',system-ui,sans-serif;color:var(--text);background:#fff;transition:border-color .15s,box-shadow .15s;-webkit-appearance:none;appearance:none}
+.iw input::placeholder,.iw textarea::placeholder{color:#C0C0D0}
+.iw input:focus,.iw select:focus,.iw textarea:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px rgba(61,53,168,.1)}
+.iw.err input,.iw.err select{border-color:var(--err)}
+.iw textarea{padding-top:10px;resize:vertical;min-height:76px;padding-left:36px}
+.ferr{font-size:12px;color:var(--err);margin-top:4px;display:none}
+.iw.err + .ferr{display:block}
+.fhint{font-size:12px;color:var(--muted);margin-top:5px;line-height:1.4}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* ── OPTION CARDS ── */
+.og{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.og.c1{grid-template-columns:1fr}
+.og.c3{grid-template-columns:1fr 1fr 1fr}
+.oc{display:flex;align-items:center;gap:9px;padding:10px 13px;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;font-size:14px;color:var(--text);transition:all .15s;user-select:none;background:#fff;position:relative}
+.oc:hover{border-color:var(--brand-mid);background:#FAFAFE}
+.oc.sel{border-color:var(--brand);background:var(--brand-light);color:var(--brand);font-weight:500}
+.oc input{display:none}
+.oc .oi{font-size:17px;flex-shrink:0}
+.oc .otxt{flex:1;line-height:1.3}
+.oc .otxt small{display:block;font-size:11px;font-weight:400;opacity:.7;margin-top:1px}
+.och{width:18px;height:18px;border:2px solid var(--border);border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;margin-left:auto}
+.oc.sel .och{border-color:var(--brand);background:var(--brand)}
+.oc.sel .och::after{content:'';width:6px;height:6px;border-radius:50%;background:#fff}
+
+/* ── CHECK CARDS ── */
+.cc{display:flex;align-items:center;gap:10px;padding:10px 13px;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;font-size:14px;color:var(--text);margin-bottom:7px;transition:all .15s;user-select:none;background:#fff}
+.cc:last-child{margin-bottom:0}
+.cc:hover{border-color:var(--brand-mid);background:#FAFAFE}
+.cc.chk{border-color:var(--brand);background:var(--brand-light);color:var(--brand)}
+.cc input{display:none}
+.cc .ci{font-size:17px;flex-shrink:0}
+.cc .ctxt{flex:1}
+.ccb{width:18px;height:18px;border:2px solid var(--border);border-radius:5px;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;margin-left:auto}
+.cc.chk .ccb{border-color:var(--brand);background:var(--brand)}
+.cc.chk .ccb::after{content:'✓';color:#fff;font-size:11px;font-weight:700}
+
+/* ── DIVIDER ── */
+.div{height:1px;background:var(--border);margin:16px 0}
+
+/* ── DISCOUNT ── */
+.disc-row{display:flex;gap:8px}
+.disc-row .iw{flex:1}
+.btn-apply{padding:0 16px;background:var(--brand-light);color:var(--brand);border:1.5px solid var(--brand);border-radius:10px;font-size:13px;font-weight:600;font-family:'DM Sans',system-ui,sans-serif;cursor:pointer;white-space:nowrap;transition:all .15s}
+.btn-apply:hover{background:var(--brand);color:#fff}
+.disc-ok{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;background:#DCFCE7;color:var(--ok);border-radius:100px;font-size:12px;font-weight:600;margin-top:8px}
+.disc-bad{font-size:12px;color:var(--err);margin-top:6px;display:flex;align-items:center;gap:5px}
+
+/* ── BUTTONS ── */
+.btn{width:100%;padding:13px;border:none;border-radius:11px;font-size:15px;font-weight:600;font-family:'DM Sans',system-ui,sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .15s,transform .1s;letter-spacing:.01em;margin-top:6px}
+.btn:active{transform:scale(.99)}
+.btn-primary{background:var(--brand);color:#fff}
+.btn-primary:hover{background:#2E278A}
+.btn-primary:disabled{background:#C4C4D4;cursor:not-allowed}
+.btn-back{background:none;border:1.5px solid var(--border);color:var(--muted);margin-top:8px}
+.btn-back:hover{border-color:var(--brand-mid);color:var(--brand);background:var(--brand-light)}
+
+/* ── LOADING ── */
+.loading-state{display:none;text-align:center;padding:3rem 0}
+.ring{width:44px;height:44px;border:3px solid var(--border);border-top-color:var(--brand);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 16px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── SUCCESS ── */
+.success-state{display:none}
+.s-check{width:60px;height:60px;background:#DCFCE7;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 12px;animation:popIn .4s cubic-bezier(.34,1.56,.64,1) both}
+@keyframes popIn{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+.s-title{font-family:'DM Serif Display',serif;font-size:22px;color:var(--text);text-align:center;margin-bottom:3px}
+.s-sub{font-size:13px;color:var(--muted);text-align:center;margin-bottom:18px}
+.range-box{background:linear-gradient(135deg,var(--brand) 0%,var(--brand-mid) 100%);border-radius:16px;padding:20px 24px;text-align:center;margin-bottom:14px;color:#fff}
+.range-box .rl{font-size:13px;opacity:.8;margin-bottom:5px}
+.range-box .rv{font-family:'DM Serif Display',serif;font-size:36px;line-height:1}
+.range-box .rn{font-size:12px;opacity:.65;margin-top:6px}
+.pills{display:flex;gap:10px;margin-bottom:14px}
+.pill{flex:1;background:var(--bg);border-radius:10px;padding:12px;text-align:center;border:1px solid var(--border)}
+.pill .pv{font-size:18px;font-weight:700;color:var(--text)}
+.pill .pl{font-size:11px;color:var(--muted);margin-top:2px}
+.bdown{background:var(--bg);border-radius:12px;padding:14px 16px;margin-bottom:14px;border:1px solid var(--border)}
+.bdown-title{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px}
+.brow{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px}
+.brow:last-child{border-bottom:none}
+.brow .bl{color:var(--muted)}
+.brow .bv{font-weight:600;color:var(--text)}
+.brow .bv.neg{color:var(--ok)}
+.email-note{display:flex;align-items:center;gap:8px;padding:11px 13px;background:var(--brand-light);border-radius:10px;font-size:13px;color:var(--brand);margin-bottom:13px}
+.btn-cta{background:var(--accent);color:#fff;text-decoration:none;display:none}
+.btn-cta:hover{background:#e85a22}
+
+/* ── TIME NOTICE ── */
+.time-note{display:none;align-items:flex-start;gap:8px;padding:10px 12px;background:#FFF7ED;border:1px solid #FED7AA;border-radius:8px;font-size:12px;color:#92400E;margin-top:8px;line-height:1.5}
+.time-note.show{display:flex}
+
+/* ── PRIVACY ── */
+.privacy-row{display:flex;align-items:flex-start;gap:9px;padding:11px 13px;background:var(--brand-light);border-radius:10px;font-size:12px;color:var(--brand);margin-bottom:4px;line-height:1.5}
+
+/* ── FOOTER ── */
+.card-footer{text-align:center;padding:12px 30px 18px;font-size:12px;color:#C0C0D0;border-top:1px solid var(--border)}
+.card-footer a{color:var(--brand-mid);text-decoration:none;font-weight:500}
+
+/* ── INIT LOADING ── */
+.init-load{text-align:center;padding:2.5rem 0}
+
+/* ── MOBILE ── */
+@media(max-width:480px){
+  body{padding:12px;align-items:flex-start}
+  .card-header,.card-body{padding-left:20px;padding-right:20px}
+  .progress-wrap{padding-left:20px;padding-right:20px}
+  .card-footer{padding-left:20px;padding-right:20px}
+  .header-title{font-size:22px}
+  .row2{grid-template-columns:1fr}
+  .og.c3{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div class="card">
+
+  <!-- HEADER -->
+  <div class="card-header">
+    <div class="company-badge">
+      <div class="company-avatar" id="co-av">JO</div>
+      <div class="company-name-badge" id="co-name">Loading…</div>
+    </div>
+    <div class="header-title">Get your <em>instant</em> moving estimate</div>
+    <div class="header-sub">Takes 2 minutes · No commitment · Full breakdown emailed instantly</div>
+    <div class="trust-row">
+      <div class="trust-item">✅ Free quote</div>
+      <div class="trust-item">🔒 Private &amp; secure</div>
+      <div class="trust-item">⚡ Instant results</div>
+    </div>
+  </div>
+
+  <!-- PROGRESS -->
+  <div class="progress-wrap" id="prog"></div>
+
+  <!-- BODY -->
+  <div class="card-body">
+
+    <!-- INIT LOADING -->
+    <div class="init-load" id="init-load">
+      <div class="ring"></div>
+      <div style="font-size:13px;color:var(--muted)">Setting up your form…</div>
+    </div>
+
+    <!-- ══ STEP 1: Contact & Addresses ══ -->
+    <div class="step" id="step-1">
+      <div class="step-title">Let's start with you</div>
+      <div class="step-sub">We'll send your full breakdown to your inbox right away.</div>
+
+      <div class="row2">
+        <div class="fg">
+          <label>Full name</label>
+          <div class="iw"><span class="ico">👤</span><input type="text" id="f-name" placeholder="John Smith" autocomplete="name"></div>
+        </div>
+        <div class="fg">
+          <label>Phone <span class="opt">(optional)</span></label>
+          <div class="iw"><span class="ico">📞</span><input type="tel" id="f-phone" placeholder="+1 (555) 000-0000" autocomplete="tel"></div>
+        </div>
+      </div>
+
+      <div class="fg">
+        <label>Email address <span class="req">*</span></label>
+        <div class="iw" id="iw-email"><span class="ico">✉️</span><input type="email" id="f-email" placeholder="john@email.com" autocomplete="email"></div>
+        <div class="ferr" id="err-email">Please enter a valid email.</div>
+      </div>
+
+      <div class="div"></div>
+
+      <div class="fg">
+        <label>Moving from <span class="req">*</span></label>
+        <div class="iw" id="iw-from"><span class="ico">📍</span><input type="text" id="f-from" placeholder="123 Main St, City, State" autocomplete="street-address"></div>
+        <div class="ferr" id="err-from">Please enter your pickup address.</div>
+      </div>
+
+      <div class="fg">
+        <label>Moving to <span class="req">*</span></label>
+        <div class="iw" id="iw-to"><span class="ico">🏠</span><input type="text" id="f-to" placeholder="456 Oak Ave, City, State" autocomplete="off"></div>
+        <div class="ferr" id="err-to">Please enter your destination address.</div>
+      </div>
+
+      <div class="row2">
+        <div class="fg">
+          <label>Unit / apt # <span class="opt">(optional)</span></label>
+          <div class="iw"><span class="ico">#️⃣</span><input type="text" id="f-unit" placeholder="e.g. Apt 4B"></div>
+        </div>
+        <div class="fg">
+          <label>Floor # <span class="opt">(optional)</span></label>
+          <div class="iw"><span class="ico">🏢</span><input type="number" id="f-floor" placeholder="e.g. 3" min="1"></div>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" onclick="nextStep(1)">Continue →</button>
+    </div>
+
+    <!-- ══ STEP 2: Home Size ══ -->
+    <div class="step" id="step-2">
+      <div class="step-title">How big is your home?</div>
+      <div class="step-sub">This is the most important factor in your estimate.</div>
+
+      <div class="fg">
+        <label>Home size <span class="req">*</span></label>
+        <div class="og" id="beds-grid">
+          <div class="oc" onclick="selOpt(this,'beds','1')"><span class="oi">🛏</span><div class="otxt">Studio / 1 bed<small>Up to ~500 sq ft</small></div><input type="radio" name="beds" value="1"><div class="och"></div></div>
+          <div class="oc" onclick="selOpt(this,'beds','2')"><span class="oi">🛏</span><div class="otxt">2 bedrooms<small>~800–1100 sq ft</small></div><input type="radio" name="beds" value="2"><div class="och"></div></div>
+          <div class="oc" onclick="selOpt(this,'beds','3')"><span class="oi">🛏</span><div class="otxt">3 bedrooms<small>~1100–1600 sq ft</small></div><input type="radio" name="beds" value="3"><div class="och"></div></div>
+          <div class="oc" onclick="selOpt(this,'beds','4')"><span class="oi">🏡</span><div class="otxt">4 bedrooms<small>~1600–2400 sq ft</small></div><input type="radio" name="beds" value="4"><div class="och"></div></div>
+          <div class="oc" onclick="selOpt(this,'beds','5')" style="grid-column:1/-1"><span class="oi">🏰</span><div class="otxt">5+ bedrooms<small>Large home or estate</small></div><input type="radio" name="beds" value="5"><div class="och"></div></div>
+        </div>
+        <div class="ferr" id="err-beds">Please select your home size.</div>
+      </div>
+
+      <div class="fg">
+        <label>Property type</label>
+        <div class="og">
+          <div class="oc" onclick="selOpt(this,'ptype','apartment')"><span class="oi">🏢</span>Apartment<input type="radio" name="ptype" value="apartment"><div class="och"></div></div>
+          <div class="oc" onclick="selOpt(this,'ptype','house')"><span class="oi">🏠</span>House<input type="radio" name="ptype" value="house"><div class="och"></div></div>
+          <div class="oc" onclick="selOpt(this,'ptype','condo')"><span class="oi">🏙️</span>Condo<input type="radio" name="ptype" value="condo"><div class="och"></div></div>
+          <div class="oc" onclick="selOpt(this,'ptype','storage')"><span class="oi">📦</span>Storage<input type="radio" name="ptype" value="storage"><div class="och"></div></div>
+        </div>
+      </div>
+
+      <div class="fg">
+        <label>How full is your home?</label>
+        <div class="og c1">
+          <div class="oc" onclick="selOpt(this,'fullness','light')"><span class="oi">📦</span><div class="otxt">Light<small>Mostly boxes, minimal furniture</small></div><input type="radio" name="fullness" value="light"><div class="och"></div></div>
+          <div class="oc" onclick="selOpt(this,'fullness','medium')"><span class="oi">🛋️</span><div class="otxt">Medium<small>Normal amount of furniture</small></div><input type="radio" name="fullness" value="medium"><div class="och"></div></div>
+          <div class="oc" onclick="selOpt(this,'fullness','heavy')"><span class="oi">🪵</span><div class="otxt">Heavy<small>Lots of large or heavy pieces</small></div><input type="radio" name="fullness" value="heavy"><div class="och"></div></div>
+        </div>
+      </div>
+
+      <div class="fg">
+        <label>Flights of stairs</label>
+        <div class="iw"><span class="ico">🪜</span>
+          <select id="f-flights">
+            <option value="0">No stairs</option>
+            <option value="1">1 flight</option>
+            <option value="2">2 flights</option>
+            <option value="3">3 flights</option>
+            <option value="4">4 flights</option>
+            <option value="5">5+ flights</option>
+          </select>
+        </div>
+        <div class="fhint">At either pickup or destination.</div>
+      </div>
+
+      <button class="btn btn-primary" onclick="nextStep(2)">Continue →</button>
+      <button class="btn btn-back" onclick="prevStep(2)">← Back</button>
+    </div>
+
+    <!-- ══ STEP 3: Move Details ══ -->
+    <div class="step" id="step-3">
+      <div class="step-title">When &amp; how?</div>
+      <div class="step-sub">Helps us fine-tune your estimate.</div>
+
+      <div class="fg">
+        <label>Do you need a truck? <span class="req">*</span></label>
+        <div class="og">
+          <div class="oc" onclick="selOpt(this,'truck','true')"><span class="oi">🚛</span><div class="otxt">Yes, include a truck<small>Full-service move</small></div><input type="radio" name="truck" value="true"><div class="och"></div></div>
+          <div class="oc" onclick="selOpt(this,'truck','false')"><span class="oi">💪</span><div class="otxt">Labor only<small>I have my own truck</small></div><input type="radio" name="truck" value="false"><div class="och"></div></div>
+        </div>
+        <div class="ferr" id="err-truck">Please make a selection.</div>
+      </div>
+
+      <div class="row2">
+        <div class="fg">
+          <label>Move date</label>
+          <div class="iw"><span class="ico">📅</span><input type="date" id="f-date" onchange="onDateChange()"></div>
+        </div>
+        <div class="fg" id="time-grp" style="display:none">
+          <label>Preferred start time</label>
+          <div class="iw"><span class="ico">🕐</span><input type="time" id="f-time" onchange="onTimeChange()"></div>
+        </div>
+      </div>
+
+      <div class="time-note" id="time-note">
+        <span style="flex-shrink:0;font-size:14px">💡</span>
+        <span id="time-note-txt">Rates may vary based on your preferred start time.</span>
+      </div>
+
+      <div class="fg" id="elev-grp" style="display:none">
+        <label>Is there an elevator at either location?</label>
+        <div class="og">
+          <div class="oc" onclick="selOpt(this,'elevator','true')"><span class="oi">🛗</span>Yes<input type="radio" name="elevator" value="true"><div class="och"></div></div>
+          <div class="oc" onclick="selOpt(this,'elevator','false')"><span class="oi">🚫</span>No<input type="radio" name="elevator" value="false"><div class="och"></div></div>
+        </div>
+      </div>
+
+      <div class="fg" id="lc-grp" style="display:none">
+        <label>Long carry? <span style="font-weight:400;color:var(--muted)">(100ft+ from truck to door)</span></label>
+        <div class="og">
+          <div class="oc" onclick="selOpt(this,'longcarry','true')"><span class="oi">📏</span>Yes<input type="radio" name="longcarry" value="true"><div class="och"></div></div>
+          <div class="oc" onclick="selOpt(this,'longcarry','false')"><span class="oi">✅</span>No<input type="radio" name="longcarry" value="false"><div class="och"></div></div>
+        </div>
+      </div>
+
+      <div class="fg">
+        <label>Parking / access notes <span class="opt">(optional)</span></label>
+        <div class="iw"><span class="ico">🚗</span><input type="text" id="f-parking" placeholder="e.g. Street parking only, loading dock on north side…"></div>
+        <div class="fhint">Helps the crew plan their arrival.</div>
+      </div>
+
+      <button class="btn btn-primary" onclick="nextStep(3)">Continue →</button>
+      <button class="btn btn-back" onclick="prevStep(3)">← Back</button>
+    </div>
+
+    <!-- ══ STEP 4: Add-ons ══ -->
+    <div class="step" id="step-4">
+      <div class="step-title">Almost done!</div>
+      <div class="step-sub">A few last details to personalise your quote.</div>
+
+      <div class="fg" id="spec-grp" style="display:none">
+        <label>Heavy or specialty items</label>
+        <div id="spec-list"></div>
+        <div class="fhint">Check anything that needs extra care — we'll factor it in.</div>
+      </div>
+
+      <div class="fg" id="pack-grp" style="display:none">
+        <label id="pack-lbl">Do you need packing service?</label>
+        <div class="og">
+          <div class="oc" onclick="selOpt(this,'packing','yes');toggleBoxes('yes')"><span class="oi">📦</span>Yes please<input type="radio" name="packing" value="yes"><div class="och"></div></div>
+          <div class="oc" onclick="selOpt(this,'packing','no');toggleBoxes('no')"><span class="oi">🙅</span>No thanks<input type="radio" name="packing" value="no"><div class="och"></div></div>
+        </div>
+        <div id="boxes-grp" style="display:none;margin-top:10px">
+          <div class="fhint" style="margin-bottom:8px">Roughly how many boxes?</div>
+          <div class="iw"><span class="ico">🔢</span><input type="number" id="f-boxes" placeholder="e.g. 20" min="1"></div>
+        </div>
+      </div>
+
+      <div class="fg">
+        <label>Why are you moving? <span class="opt">(optional)</span></label>
+        <div class="og">
+          <div class="oc" onclick="selOpt(this,'reason','new_job')"><span class="oi">💼</span>New job<input type="radio" name="reason" value="new_job"><div class="och"></div></div>
+          <div class="oc" onclick="selOpt(this,'reason','upsizing')"><span class="oi">⬆️</span>Upsizing<input type="radio" name="reason" value="upsizing"><div class="och"></div></div>
+          <div class="oc" onclick="selOpt(this,'reason','downsizing')"><span class="oi">⬇️</span>Downsizing<input type="radio" name="reason" value="downsizing"><div class="och"></div></div>
+          <div class="oc" onclick="selOpt(this,'reason','other')"><span class="oi">✨</span>Other<input type="radio" name="reason" value="other"><div class="och"></div></div>
+        </div>
+      </div>
+
+      <div class="fg" id="disc-grp" style="display:none">
+        <label>Discount code <span class="opt">(optional)</span></label>
+        <div class="disc-row">
+          <div class="iw"><span class="ico">🏷️</span><input type="text" id="f-disc" placeholder="Enter code" style="text-transform:uppercase;letter-spacing:.05em" oninput="this.value=this.value.toUpperCase()"></div>
+          <button class="btn-apply" onclick="applyDisc()">Apply</button>
+        </div>
+        <div id="disc-result"></div>
+      </div>
+
+      <div class="fg">
+        <label>Anything else we should know? <span class="opt">(optional)</span></label>
+        <div class="iw"><span class="ico">💬</span><textarea id="f-notes" placeholder="Fragile artwork, tight stairwell, specific timing needs…"></textarea></div>
+      </div>
+
+      <div class="privacy-row">
+        <span>🔒</span>
+        <span>Your info is only shared with <span id="priv-co">the moving company</span> and is never sold or spammed.</span>
+      </div>
+
+      <button class="btn btn-primary" id="sub-btn" onclick="submitQuote()"><span>⚡</span> Get my instant quote</button>
+      <button class="btn btn-back" onclick="prevStep(4)">← Back</button>
+    </div>
+
+    <!-- LOADING -->
+    <div class="loading-state" id="step-load">
+      <div class="ring"></div>
+      <div style="font-size:15px;color:var(--muted);margin-bottom:6px">Calculating your estimate…</div>
+      <div style="font-size:13px;color:#B0B0C0">This takes just a moment</div>
+    </div>
+
+    <!-- SUCCESS -->
+    <div class="success-state" id="step-ok">
+      <div class="s-check">✅</div>
+      <div class="s-title" id="ok-title">Your estimate is ready</div>
+      <div class="s-sub">Here's your personalised moving quote</div>
+
+      <div class="range-box">
+        <div class="rl">Estimated price range</div>
+        <div class="rv" id="ok-range">—</div>
+        <div class="rn">Final price depends on actual move duration</div>
+      </div>
+
+      <div class="pills">
+        <div class="pill"><div class="pv" id="ok-crew">—</div><div class="pl">Movers</div></div>
+        <div class="pill" id="ok-hrs-pill"><div class="pv" id="ok-hrs">—</div><div class="pl">Est. hours</div></div>
+        <div class="pill" id="ok-rate-pill" style="display:none"><div class="pv" id="ok-rate">—</div><div class="pl">Per hour</div></div>
+      </div>
+
+      <div class="bdown">
+        <div class="bdown-title">Price breakdown</div>
+        <div id="ok-rows"></div>
+      </div>
+
+      <div class="email-note">📬 Full breakdown sent to your email — check your inbox.</div>
+
+      <a id="ok-cta" href="#" target="_blank" class="btn btn-cta" id="ok-cta">
+        <span>📅</span><span id="ok-cta-txt">Book your move now</span>
+      </a>
+    </div>
+
+  </div><!-- /card-body -->
+
+  <div class="card-footer">Powered by <a href="https://joax.online" target="_blank" rel="noopener">Joax</a> · Instant quote engine</div>
+</div>
+
+<script>
+const API_URL     = 'https://n8n.srv1058135.hstgr.cloud/webhook';
+const CLIENT_SLUG = 'ballastackmovers';
+
+let config = {}, formData = {}, discApplied = null, curStep = 0;
+const STEPS = 4;
+const STEP_LABELS = ['Contact','Home size','Details','Add-ons'];
+
+// ── INIT ───────────────────────────────────────────────────────────
+async function init() {
+  try {
+    const res = await fetch(`${API_URL}/config`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ client_slug: CLIENT_SLUG })
+    });
+    if (res.ok) { const d = await res.json(); config = Array.isArray(d) ? d[0] : d; }
+  } catch(e) {}
+
+  document.getElementById('init-load').style.display = 'none';
+  buildProgress();
+  buildDynamic();
+  showStep(1);
+
+  if (config.company_name) {
+    const n = config.company_name;
+    document.title = n + ' — Instant Quote';
+    document.getElementById('co-name').textContent = n;
+    document.getElementById('priv-co').textContent = n;
+    const w = n.split(' ');
+    document.getElementById('co-av').textContent = (w.length>=2 ? w[0][0]+w[1][0] : n.slice(0,2)).toUpperCase();
+  } else {
+    document.getElementById('co-name').textContent = 'Get an Instant Quote';
+  }
+}
+
+// ── PROGRESS ──────────────────────────────────────────────────────
+function buildProgress() {
+  const wrap = document.getElementById('prog');
+  for (let i = 1; i <= STEPS; i++) {
+    const s = document.createElement('div');
+    s.className = 'pstep';
+    s.innerHTML = `<div class="pnum" id="pn${i}">${i}</div>`;
+    wrap.appendChild(s);
+    if (i < STEPS) {
+      const l = document.createElement('div');
+      l.className = 'pline'; l.id = 'pl'+i;
+      wrap.appendChild(l);
+    }
+  }
+}
+
+function updateProgress(n) {
+  for (let i = 1; i <= STEPS; i++) {
+    const el = document.getElementById('pn'+i);
+    if (!el) continue;
+    el.className = 'pnum';
+    if (i < n)       { el.className += ' done'; el.textContent = '✓'; }
+    else if (i === n) { el.className += ' active'; el.textContent = i; }
+    else              { el.textContent = i; }
+    if (i < STEPS) {
+      const l = document.getElementById('pl'+i);
+      if (l) l.className = 'pline' + (i < n ? ' done' : '');
+    }
+  }
+}
+
+// ── DYNAMIC FIELDS FROM CONFIG ────────────────────────────────────
+function buildDynamic() {
+  if (config.elevator_fee > 0)   document.getElementById('elev-grp').style.display = 'block';
+  if (config.long_carry_fee > 0) document.getElementById('lc-grp').style.display   = 'block';
+
+  const hasTime = (config.time_slots||[]).length > 0 || (config.holidays||[]).length > 0;
+  if (hasTime) {
+    document.getElementById('time-grp').style.display = 'block';
+    document.getElementById('time-note').classList.add('show');
+  }
+
+  const hasPack = config.packing_price_per_box > 0 || config.packing_flat_fee > 0;
+  if (hasPack) {
+    document.getElementById('pack-grp').style.display = 'block';
+    const mode = config.packing_mode;
+    if (mode === 'per_box' && config.packing_price_per_box > 0)
+      document.getElementById('pack-lbl').textContent = `Packing service ($${config.packing_price_per_box}/box)`;
+    else if (config.packing_flat_fee > 0)
+      document.getElementById('pack-lbl').textContent = `Packing service (flat $${config.packing_flat_fee})`;
+  }
+
+  const items = config.specialty_items || [];
+  if (items.length > 0) {
+    document.getElementById('spec-grp').style.display = 'block';
+    const list = document.getElementById('spec-list');
+    items.forEach(item => {
+      const d = document.createElement('div');
+      d.className = 'cc';
+      d.dataset.checked = 'false';
+      d.innerHTML = `<span class="ci">📦</span><span class="ctxt">${item.label}</span><input type="checkbox" value="${item.minutes}" data-label="${item.label}" style="display:none"><div class="ccb"></div>`;
+      d.addEventListener('click', () => {
+        const on = d.dataset.checked === 'true';
+        d.dataset.checked = on ? 'false' : 'true';
+        d.classList.toggle('chk', !on);
+        d.querySelector('input').checked = !on;
+      });
+      list.appendChild(d);
+    });
+  }
+
+  if (Object.keys(config.discount_codes || {}).length > 0)
+    document.getElementById('disc-grp').style.display = 'block';
+}
+
+// ── TIME / DATE CHANGES ───────────────────────────────────────────
+function onTimeChange() {
+  const val = document.getElementById('f-time').value;
+  if (!val) return;
+  const [h,m] = val.split(':').map(Number);
+  const mins = h*60+m;
+  for (const s of (config.time_slots||[])) {
+    if (!s.start||!s.end) continue;
+    const [sh,sm]=s.start.split(':').map(Number), [eh,em]=s.end.split(':').map(Number);
+    if (mins >= sh*60+sm && mins < eh*60+em) {
+      const pct = Math.round((s.multiplier-1)*100);
+      document.getElementById('time-note-txt').textContent =
+        `"${s.label}" slot — rate ${pct>=0?'+':''}${pct}% for this window.`;
+      document.getElementById('time-note').classList.add('show');
+      return;
+    }
+  }
+  document.getElementById('time-note-txt').textContent = 'Rates may vary by start time.';
+}
+
+function onDateChange() {
+  const val = document.getElementById('f-date').value;
+  if (!val) return;
+  const h = (config.holidays||[]).find(x => x.date && x.date.slice(0,10)===val);
+  if (h) {
+    const pct = Math.round((h.multiplier-1)*100);
+    document.getElementById('time-note-txt').textContent =
+      `Holiday pricing: ${h.label} — rate ${pct>=0?'+':''}${pct}%.`;
+    document.getElementById('time-note').classList.add('show');
+  }
+}
+
+// ── NAVIGATION ────────────────────────────────────────────────────
+function showStep(n) {
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById('step-'+n);
+  if (el) el.classList.add('active');
+  document.getElementById('step-load').style.display = 'none';
+  document.getElementById('step-ok').style.display = 'none';
+  curStep = n;
+  updateProgress(n);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function nextStep(from) {
+  if (!validate(from)) return;
+  collect(from);
+  showStep(from+1);
+}
+function prevStep(from) { if (from>1) showStep(from-1); }
+
+function showLoading() {
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+  document.getElementById('step-load').style.display = 'block';
+  document.getElementById('step-ok').style.display = 'none';
+  updateProgress(STEPS+1);
+}
+
+function showSuccess() {
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+  document.getElementById('step-load').style.display = 'none';
+  document.getElementById('step-ok').style.display = 'block';
+}
+
+// ── VALIDATION ────────────────────────────────────────────────────
+function setErr(iwId, errId, show) {
+  const iw = document.getElementById(iwId), er = document.getElementById(errId);
+  if (iw) iw.classList.toggle('err', show);
+  if (er) er.style.display = show ? 'block' : 'none';
+}
+
+function validate(step) {
+  let ok = true;
+  if (step===1) {
+    const em = document.getElementById('f-email').value.trim();
+    const eok = em && em.includes('@') && em.includes('.');
+    setErr('iw-email','err-email',!eok); if (!eok) ok=false;
+    const fr = document.getElementById('f-from').value.trim();
+    setErr('iw-from','err-from',!fr); if (!fr) ok=false;
+    const to = document.getElementById('f-to').value.trim();
+    setErr('iw-to','err-to',!to); if (!to) ok=false;
+  }
+  if (step===2) {
+    const b = document.querySelector('input[name=beds]:checked');
+    const el = document.getElementById('err-beds');
+    if (el) el.style.display = b ? 'none' : 'block';
+    if (!b) ok=false;
+  }
+  if (step===3) {
+    const t = document.querySelector('input[name=truck]:checked');
+    const el = document.getElementById('err-truck');
+    if (el) el.style.display = t ? 'none' : 'block';
+    if (!t) ok=false;
+  }
+  return ok;
+}
+
+// ── COLLECT STEP DATA ─────────────────────────────────────────────
+function collect(step) {
+  if (step===1) {
+    formData.name         = document.getElementById('f-name').value.trim();
+    formData.email        = document.getElementById('f-email').value.trim();
+    formData.phone        = document.getElementById('f-phone').value.trim();
+    formData.address_from = document.getElementById('f-from').value.trim();
+    formData.address_to   = document.getElementById('f-to').value.trim();
+    formData.unit         = document.getElementById('f-unit').value.trim();
+    formData.floor        = parseInt(document.getElementById('f-floor').value)||null;
+  }
+  if (step===2) {
+    formData.bedrooms  = parseInt(document.querySelector('input[name=beds]:checked').value);
+    formData.flights   = parseInt(document.getElementById('f-flights').value)||0;
+    const pt = document.querySelector('input[name=ptype]:checked');
+    const fl = document.querySelector('input[name=fullness]:checked');
+    formData.property_type = pt ? pt.value : null;
+    formData.load_size     = fl ? fl.value : 'medium';
+  }
+  if (step===3) {
+    formData.truck     = document.querySelector('input[name=truck]:checked').value==='true';
+    formData.move_date = document.getElementById('f-date').value;
+    formData.move_time = document.getElementById('f-time')?.value || '';
+    formData.parking_notes = document.getElementById('f-parking').value.trim();
+    const el = document.querySelector('input[name=elevator]:checked');
+    const lc = document.querySelector('input[name=longcarry]:checked');
+    formData.has_elevator = el ? el.value==='true' : false;
+    formData.long_carry   = lc ? lc.value==='true' : false;
+    if (formData.move_date) {
+      const d = new Date(formData.move_date+'T12:00:00');
+      formData.is_weekend = d.getDay()===0 || d.getDay()===6;
+    }
+  }
+}
+
+// ── OPTION CARDS ─────────────────────────────────────────────────
+function selOpt(el, name, value) {
+  document.querySelectorAll('.oc').forEach(o => {
+    if (o.querySelector(`input[name="${name}"]`)) {
+      o.classList.remove('sel');
+      const inp = o.querySelector(`input[name="${name}"]`);
+      if (inp) inp.checked = false;
+    }
+  });
+  el.classList.add('sel');
+  const inp = el.querySelector(`input[name="${name}"]`);
+  if (inp) inp.checked = true;
+  if (name==='beds')  { const e=document.getElementById('err-beds');  if(e) e.style.display='none'; }
+  if (name==='truck') { const e=document.getElementById('err-truck'); if(e) e.style.display='none'; }
+}
+
+function toggleBoxes(val) {
+  const grp = document.getElementById('boxes-grp');
+  if (grp) grp.style.display = (val==='yes' && config.packing_mode==='per_box') ? 'block' : 'none';
+}
+
+// ── DISCOUNT ─────────────────────────────────────────────────────
+function applyDisc() {
+  const code = document.getElementById('f-disc').value.trim().toUpperCase();
+  const codes = config.discount_codes || {};
+  const el = document.getElementById('disc-result');
+  if (codes[code]) {
+    discApplied = code;
+    const d = codes[code];
+    el.innerHTML = `<div class="disc-ok">✓ ${code} — ${d.type==='percent'?d.value+'% off':'$'+d.value+' off'}</div>`;
+  } else {
+    discApplied = null;
+    el.innerHTML = `<div class="disc-bad">✗ Code not recognised — please check and try again</div>`;
+  }
+}
+
+// ── SUBMIT ───────────────────────────────────────────────────────
+async function submitQuote() {
+  const heavyItems = [], specLabels = [];
+  document.querySelectorAll('#spec-list input[type=checkbox]:checked').forEach(cb => {
+    heavyItems.push(parseInt(cb.value));
+    specLabels.push(cb.dataset.label);
+  });
+  formData.heavy_items      = heavyItems;
+  formData.specialty_labels = specLabels;
+
+  const pack = document.querySelector('input[name=packing]:checked');
+  formData.packing_boxes = (pack && pack.value==='yes')
+    ? parseInt(document.getElementById('f-boxes').value)||1 : 0;
+
+  const rsn = document.querySelector('input[name=reason]:checked');
+  formData.move_reason = rsn ? rsn.value : null;
+  formData.notes       = document.getElementById('f-notes').value.trim();
+  if (discApplied) formData.discount_code = discApplied;
+
+  showLoading();
+
+  try {
+    const res = await fetch(`${API_URL}/quote`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ ...formData, client_slug: CLIENT_SLUG })
+    });
+    const text = await res.text();
+    const data = JSON.parse(text);
+    const result = Array.isArray(data) ? data[0] : data;
+    if (result && result.low != null) { renderSuccess(result); showSuccess(); }
+    else throw new Error('No quote');
+  } catch(e) {
+    showStep(4);
+    const btn = document.getElementById('sub-btn');
+    btn.textContent = 'Something went wrong — please try again';
+    btn.style.background = 'var(--err)';
+    setTimeout(() => {
+      btn.innerHTML = '<span>⚡</span> Get my instant quote';
+      btn.style.background = '';
+    }, 3500);
+  }
+}
+
+// ── RENDER SUCCESS ────────────────────────────────────────────────
+function renderSuccess(r) {
+  document.getElementById('ok-title').textContent = (r.company_name||'Your') + ' Moving Estimate';
+  document.getElementById('ok-range').textContent =
+    '$'+(r.low||0).toLocaleString()+' – $'+(r.high||0).toLocaleString();
+  document.getElementById('ok-crew').textContent = r.movers || '—';
+  document.getElementById('ok-hrs').textContent  = r.hours  ? r.hours+' hrs' : '—';
+  if (r.rate) {
+    document.getElementById('ok-rate-pill').style.display = 'block';
+    document.getElementById('ok-rate').textContent = '$'+r.rate+'/hr';
+  }
+  document.getElementById('ok-rows').innerHTML =
+    (r.lineItems||[]).filter(i=>i.amount!==0).map(i=>`
+      <div class="brow">
+        <span class="bl">${i.label}</span>
+        <span class="bv ${i.amount<0?'neg':''}">${i.amount<0?'-$'+Math.abs(i.amount).toLocaleString():'$'+i.amount.toLocaleString()}</span>
+      </div>`).join('');
+
+  const qm = r.quote_message || {};
+  if (qm.booking_url) {
+    const cta = document.getElementById('ok-cta');
+    cta.href = qm.booking_url;
+    cta.style.display = 'flex';
+    document.getElementById('ok-cta-txt').textContent = qm.cta || 'Book your move now';
+  }
+}
+
+init();
+</script>
+</body>
+</html>
