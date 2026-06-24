@@ -317,6 +317,13 @@ tr:hover td{background:#fafafa}
       <!-- PROTECTION -->
       <div id="tab-protection" style="display:none">
         <div class="card">
+          <div class="toggle-row">
+  <div>
+    <div class="field-label">Enable protection plan</div>
+    <div class="field-sub">Turn protection charges on or off</div>
+  </div>
+  <input type="checkbox" id="protection_enabled">
+</div>
           <div class="card-title">Protection plan cost</div>
           <div class="card-sub">Flat fee added to every estimate by bedroom count</div>
           <div class="field-row"><div class="field-label">1 bedroom</div><div class="field-input"><span>$</span><input type="number" id="p_1"></div></div>
@@ -844,6 +851,8 @@ async function loadConfig() {
   const rn = c.rates_without_truck || {};
   const st = c.stairs_addon || {};
   const pp = c.protection_plan || {};
+  document.getElementById('protection_enabled').checked =
+    c.protection_enabled !== false;
   const mr = c.mover_rules || {};
 
   ['2','3','4'].forEach(n => setVal('r_truck_'+n, rt[n]||''));
@@ -1080,6 +1089,7 @@ async function saveConfig() {
     rates_without_truck: { 2: getVal('r_notruck_2'), 3: getVal('r_notruck_3'), 4: getVal('r_notruck_4'), 5: getVal('r_notruck_5') },
     base_hours: { 1: getVal('h_1'), 2: getVal('h_2'), 3: getVal('h_3'), 4: getVal('h_4'), 5: getVal('h_5') },
     protection_plan: { 1: getVal('p_1'), 2: getVal('p_2'), 3: getVal('p_3'), 4: getVal('p_4'), 5: getVal('p_5') },
+    protection_enabled: document.getElementById('protection_enabled').checked,
     stairs_addon: { 1: getVal('s_1'), 2: getVal('s_2'), 3: getVal('s_3'), 4: getVal('s_4'), 5: getVal('s_5') },
     minimum_hours: getVal('f_min_hours'),
     fuel_fee: getVal('f_fuel'),
