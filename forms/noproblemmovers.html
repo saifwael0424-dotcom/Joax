@@ -7,16 +7,16 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
 <style>
 :root {
-  --brand:#3D35A8; --brand-light:#EEEDFE; --brand-mid:#6C63E0;
-  --accent:#FF6B35; --text:#0F0E1A; --muted:#6B6B80;
-  --border:#E4E4EF; --bg:#F7F7FC; --card:#fff;
+  --brand:#0D2B6E; --brand-light:#E6EBF8; --brand-mid:#1A3F9F;
+  --accent:#3B82F6; --text:#0B1220; --muted:#6B7280;
+  --border:#DDE3EF; --bg:#F0F3FA; --card:#fff;
   --ok:#16A34A; --err:#DC2626;
-  --shadow:0 4px 40px rgba(61,53,168,0.12);
+  --shadow:0 12px 40px rgba(13,43,110,0.13);
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px 16px;overflow-x:hidden}
-body::before{content:'';position:fixed;top:-200px;right:-200px;width:600px;height:600px;background:radial-gradient(circle,rgba(108,99,224,.13) 0%,transparent 70%);pointer-events:none}
-body::after{content:'';position:fixed;bottom:-150px;left:-150px;width:500px;height:500px;background:radial-gradient(circle,rgba(255,107,53,.07) 0%,transparent 70%);pointer-events:none}
+body::before{content:'';position:fixed;top:-200px;right:-200px;width:600px;height:600px;background:radial-gradient(circle,rgba(13,43,110,.10) 0%,transparent 70%);pointer-events:none}
+body::after{content:'';position:fixed;bottom:-150px;left:-150px;width:500px;height:500px;background:radial-gradient(circle,rgba(59,130,246,.07) 0%,transparent 70%);pointer-events:none}
 
 .card{background:var(--card);border-radius:22px;width:100%;max-width:520px;box-shadow:var(--shadow);overflow:hidden;animation:cardIn .4s cubic-bezier(.34,1.56,.64,1) both}
 @keyframes cardIn{from{opacity:0;transform:translateY(20px) scale(.97)}to{opacity:1;transform:none}}
@@ -24,7 +24,6 @@ body::after{content:'';position:fixed;bottom:-150px;left:-150px;width:500px;heig
 /* ── HEADER ── */
 .card-header{padding:26px 30px 18px;border-bottom:1px solid var(--border)}
 .company-badge{display:inline-flex;align-items:center;gap:8px;padding:5px 14px 5px 5px;background:var(--brand-light);border-radius:100px;margin-bottom:14px}
-.company-avatar{width:28px;height:28px;background:var(--brand);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
 .company-name-badge{font-size:13px;font-weight:600;color:var(--brand)}
 .header-title{font-family:'DM Serif Display',serif;font-size:25px;color:var(--text);line-height:1.2;margin-bottom:5px}
 .header-title em{font-style:italic;color:var(--brand-mid)}
@@ -33,7 +32,7 @@ body::after{content:'';position:fixed;bottom:-150px;left:-150px;width:500px;heig
 .trust-item{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--muted)}
 
 /* ── PROGRESS ── */
-.progress-wrap{display:flex;align-items:center;padding:14px 30px 0;gap:0}
+.progress-wrap{display:flex;align-items:center;padding:14px 30px 0;gap:0;background:#fff}
 .pstep{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;position:relative}
 .pstep:last-child{flex:0}
 .pnum{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;border:2px solid var(--border);color:var(--muted);background:var(--card);transition:all .25s;position:relative;z-index:1}
@@ -111,7 +110,7 @@ body::after{content:'';position:fixed;bottom:-150px;left:-150px;width:500px;heig
 .btn{width:100%;padding:13px;border:none;border-radius:11px;font-size:15px;font-weight:600;font-family:'DM Sans',system-ui,sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .15s,transform .1s;letter-spacing:.01em;margin-top:6px}
 .btn:active{transform:scale(.99)}
 .btn-primary{background:var(--brand);color:#fff}
-.btn-primary:hover{background:#2E278A}
+.btn-primary:hover{background:#1D4ED8;transform:translateY(-1px)}
 .btn-primary:disabled{background:#C4C4D4;cursor:not-allowed}
 .btn-back{background:none;border:1.5px solid var(--border);color:var(--muted);margin-top:8px}
 .btn-back:hover{border-color:var(--brand-mid);color:var(--brand);background:var(--brand-light)}
@@ -143,8 +142,8 @@ body::after{content:'';position:fixed;bottom:-150px;left:-150px;width:500px;heig
 .brow .bv{font-weight:600;color:var(--text)}
 .brow .bv.neg{color:var(--ok)}
 .email-note{display:flex;align-items:center;gap:8px;padding:11px 13px;background:var(--brand-light);border-radius:10px;font-size:13px;color:var(--brand);margin-bottom:13px}
-.btn-cta{background:var(--accent);color:#fff;text-decoration:none;display:none}
-.btn-cta:hover{background:#e85a22}
+.btn-cta{background:var(--accent);color:#fff;text-decoration:none;display:none;box-shadow:0 8px 20px rgba(59,130,246,0.25)}
+.btn-cta:hover{background:#1D4ED8}
 
 /* ── TIME NOTICE ── */
 .time-note{display:none;align-items:flex-start;gap:8px;padding:10px 12px;background:#FFF7ED;border:1px solid #FED7AA;border-radius:8px;font-size:12px;color:#92400E;margin-top:8px;line-height:1.5}
@@ -176,17 +175,17 @@ body::after{content:'';position:fixed;bottom:-150px;left:-150px;width:500px;heig
 <div class="card">
 
   <!-- HEADER -->
-  <div class="card-header">
-    <div class="company-badge">
-      <div class="company-avatar" id="co-av">JO</div>
-      <div class="company-name-badge" id="co-name">Loading…</div>
+  <div class="card-header" style="background:linear-gradient(135deg,#0D2B6E 0%,#1A3F9F 100%);border-bottom:none;padding-bottom:22px">
+    <div class="company-badge" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25)">
+      <img src="https://noproblemmovers.com/wp-content/uploads/2024/02/cropped-favicon-270x270.png" class="company-logo" alt="No Problem Movers" style="width:28px;height:28px;border-radius:50%;object-fit:cover">
+      <div class="company-name-badge" id="co-name" style="color:#fff">Loading…</div>
     </div>
-    <div class="header-title">Get your <em>instant</em> moving estimate</div>
-    <div class="header-sub">Takes 2 minutes · No commitment · Full breakdown emailed instantly</div>
+    <div class="header-title" style="color:#fff">Get your <em style="color:#93C5FD;font-style:italic">instant</em> moving estimate</div>
+    <div class="header-sub" style="color:rgba(255,255,255,0.75)">Takes 2 minutes · No commitment · Full breakdown emailed instantly</div>
     <div class="trust-row">
-      <div class="trust-item">✅ Free quote</div>
-      <div class="trust-item">🔒 Private &amp; secure</div>
-      <div class="trust-item">⚡ Instant results</div>
+      <div class="trust-item" style="color:rgba(255,255,255,0.85)">✅ Free quote</div>
+      <div class="trust-item" style="color:rgba(255,255,255,0.85)">🔒 Private &amp; secure</div>
+      <div class="trust-item" style="color:rgba(255,255,255,0.85)">⚡ Instant results</div>
     </div>
   </div>
 
@@ -207,15 +206,33 @@ body::after{content:'';position:fixed;bottom:-150px;left:-150px;width:500px;heig
       <div class="step-title">Let's start with you</div>
       <div class="step-sub">We'll send your full breakdown to your inbox right away.</div>
 
+      <div class="fg">
+        <label>Services required <span class="req">*</span></label>
+        <div class="fhint" style="margin-bottom:10px">You may select multiple services.</div>
+        <div id="services-list">
+          <div class="cc" onclick="toggleService(this,'moving')" data-service="moving"><span class="ci">🚛</span><span class="ctxt">Moving</span><div class="ccb"></div></div>
+          <div class="cc" onclick="toggleService(this,'packing')" data-service="packing"><span class="ci">📦</span><span class="ctxt">Packing Services</span><div class="ccb"></div></div>
+          <div class="cc" onclick="toggleService(this,'unpacking')" data-service="unpacking"><span class="ci">📤</span><span class="ctxt">Unpacking Services</span><div class="ccb"></div></div>
+          <div class="cc" onclick="toggleService(this,'storage')" data-service="storage"><span class="ci">🏭</span><span class="ctxt">Storage</span><div class="ccb"></div></div>
+          <div class="cc" onclick="toggleService(this,'senior_downsizing')" data-service="senior_downsizing"><span class="ci">🏡</span><span class="ctxt">Senior Downsizing</span><div class="ccb"></div></div>
+          <div class="cc" onclick="toggleService(this,'post_move_cleaning')" data-service="post_move_cleaning"><span class="ci">🧹</span><span class="ctxt">Post Move Cleaning Service</span><div class="ccb"></div></div>
+          <div class="cc" onclick="toggleService(this,'move_disassemble')" data-service="move_disassemble"><span class="ci">🔧</span><span class="ctxt">Move &amp; Disassemble Only</span><div class="ccb"></div></div>
+          <div class="cc" onclick="toggleService(this,'move_disassemble_reassemble')" data-service="move_disassemble_reassemble"><span class="ci">🔩</span><span class="ctxt">Move with Disassembly &amp; Reassembly</span><div class="ccb"></div></div>
+        </div>
+        <div class="ferr" id="err-services">Please select at least one service.</div>
+      </div>
+
+      <div class="div"></div>
+
       <div class="row2">
         <div class="fg">
           <label>Full name</label>
           <div class="iw"><span class="ico">👤</span><input type="text" id="f-name" placeholder="John Smith" autocomplete="name"></div>
         </div>
         <div class="fg">
-          <label>Phone</label>
-          <div class="iw" id="iw-phone"><span class="ico">📞</span><input type="tel" id="f-phone" required placeholder="+1 (555) 000-0000" autocomplete="tel"></div>
-          <div class="ferr" id="err-phone">Please enter a valid phone number.</div>
+          <label>Phone <span class="req">*</span></label>
+          <div class="iw" id="iw-phone"><span class="ico">📞</span><input type="tel" id="f-phone" placeholder="+1 (555) 000-0000" autocomplete="tel"></div>
+          <div class="ferr" id="err-phone">Please enter your phone number.</div>
         </div>
       </div>
 
@@ -231,12 +248,16 @@ body::after{content:'';position:fixed;bottom:-150px;left:-150px;width:500px;heig
         <label>Moving from <span class="req">*</span></label>
         <div class="iw" id="iw-from"><span class="ico">📍</span><input type="text" id="f-from" placeholder="123 Main St, City, State" autocomplete="street-address"></div>
         <div class="ferr" id="err-from">Please enter your pickup address.</div>
+        <div class="iw" style="margin-top:8px" id="iw-zip-from"><span class="ico">🔢</span><input type="text" id="f-zip-from" placeholder="ZIP code" maxlength="10" autocomplete="postal-code" style="letter-spacing:.05em"></div>
+        <div class="ferr" id="err-zip-from">Please enter the pickup ZIP code.</div>
       </div>
 
       <div class="fg">
         <label>Moving to <span class="req">*</span></label>
         <div class="iw" id="iw-to"><span class="ico">🏠</span><input type="text" id="f-to" placeholder="456 Oak Ave, City, State" autocomplete="off"></div>
         <div class="ferr" id="err-to">Please enter your destination address.</div>
+        <div class="iw" style="margin-top:8px" id="iw-zip-to"><span class="ico">🔢</span><input type="text" id="f-zip-to" placeholder="ZIP code" maxlength="10" autocomplete="off" style="letter-spacing:.05em"></div>
+        <div class="ferr" id="err-zip-to">Please enter the destination ZIP code.</div>
       </div>
 
       <div class="row2">
@@ -324,8 +345,9 @@ body::after{content:'';position:fixed;bottom:-150px;left:-150px;width:500px;heig
 
       <div class="row2">
         <div class="fg">
-          <label>Move date</label>
-          <div class="iw"><span class="ico">📅</span><input type="date" id="f-date" onchange="onDateChange()"></div>
+          <label>Move date <span class="req">*</span></label>
+          <div class="iw" id="iw-date"><span class="ico">📅</span><input type="date" id="f-date" onchange="onDateChange()"></div>
+          <div class="ferr" id="err-date">Please select your move date.</div>
         </div>
         <div class="fg" id="time-grp" style="display:none">
           <label>Preferred start time</label>
@@ -376,11 +398,12 @@ body::after{content:'';position:fixed;bottom:-150px;left:-150px;width:500px;heig
       </div>
 
       <div class="fg" id="pack-grp" style="display:none">
-        <label id="pack-lbl">Do you need packing service?</label>
+        <label id="pack-lbl">Do you need packing service? <span class="req">*</span></label>
         <div class="og">
           <div class="oc" onclick="selOpt(this,'packing','yes');toggleBoxes('yes')"><span class="oi">📦</span>Yes please<input type="radio" name="packing" value="yes"><div class="och"></div></div>
           <div class="oc" onclick="selOpt(this,'packing','no');toggleBoxes('no')"><span class="oi">🙅</span>No thanks<input type="radio" name="packing" value="no"><div class="och"></div></div>
         </div>
+        <div class="ferr" id="err-packing" style="display:none">Please select packing service option.</div>
         <div id="boxes-grp" style="display:none;margin-top:10px">
           <div class="fhint" style="margin-bottom:8px">Roughly how many boxes?</div>
           <div class="iw"><span class="ico">🔢</span><input type="number" id="f-boxes" placeholder="e.g. 20" min="1"></div>
@@ -490,8 +513,6 @@ async function init() {
     document.title = n + ' — Instant Quote';
     document.getElementById('co-name').textContent = n;
     document.getElementById('priv-co').textContent = n;
-    const w = n.split(' ');
-    document.getElementById('co-av').textContent = (w.length>=2 ? w[0][0]+w[1][0] : n.slice(0,2)).toUpperCase();
   } else {
     document.getElementById('co-name').textContent = 'Get an Instant Quote';
   }
@@ -646,15 +667,23 @@ function setErr(iwId, errId, show) {
 function validate(step) {
   let ok = true;
   if (step===1) {
+    const services = [...document.querySelectorAll('#services-list .cc[data-checked="true"]')];
+    const errSvc = document.getElementById('err-services');
+    if (errSvc) errSvc.style.display = services.length ? 'none' : 'block';
+    if (!services.length) ok=false;
     const em = document.getElementById('f-email').value.trim();
     const eok = em && em.includes('@') && em.includes('.');
     setErr('iw-email','err-email',!eok); if (!eok) ok=false;
+    const ph = document.getElementById('f-phone').value.trim();
+    setErr('iw-phone','err-phone',!ph); if (!ph) ok=false;
     const fr = document.getElementById('f-from').value.trim();
     setErr('iw-from','err-from',!fr); if (!fr) ok=false;
+    const zf = document.getElementById('f-zip-from').value.trim();
+    setErr('iw-zip-from','err-zip-from',!zf); if (!zf) ok=false;
     const to = document.getElementById('f-to').value.trim();
     setErr('iw-to','err-to',!to); if (!to) ok=false;
-    const phone = document.getElementById('f-phone').value.trim();
-    setErr('iw-phone','err-phone',!eok); if (!eok) ok=false;
+    const zt = document.getElementById('f-zip-to').value.trim();
+    setErr('iw-zip-to','err-zip-to',!zt); if (!zt) ok=false;
   }
   if (step===2) {
     const b = document.querySelector('input[name=beds]:checked');
@@ -667,6 +696,17 @@ function validate(step) {
     const el = document.getElementById('err-truck');
     if (el) el.style.display = t ? 'none' : 'block';
     if (!t) ok=false;
+    const dt = document.getElementById('f-date').value;
+    setErr('iw-date','err-date',!dt); if (!dt) ok=false;
+  }
+  if (step===4) {
+    const packGrp = document.getElementById('pack-grp');
+    if (packGrp && packGrp.style.display !== 'none') {
+      const pk = document.querySelector('input[name=packing]:checked');
+      const errPk = document.getElementById('err-packing');
+      if (errPk) errPk.style.display = pk ? 'none' : 'block';
+      if (!pk) ok=false;
+    }
   }
   return ok;
 }
@@ -674,11 +714,14 @@ function validate(step) {
 // ── COLLECT STEP DATA ─────────────────────────────────────────────
 function collect(step) {
   if (step===1) {
+    formData.services     = [...document.querySelectorAll('#services-list .cc[data-checked="true"]')].map(el => el.dataset.service);
     formData.name         = document.getElementById('f-name').value.trim();
     formData.email        = document.getElementById('f-email').value.trim();
     formData.phone        = document.getElementById('f-phone').value.trim();
     formData.address_from = document.getElementById('f-from').value.trim();
+    formData.zip_from     = document.getElementById('f-zip-from').value.trim();
     formData.address_to   = document.getElementById('f-to').value.trim();
+    formData.zip_to       = document.getElementById('f-zip-to').value.trim();
     formData.unit         = document.getElementById('f-unit').value.trim();
     formData.floor        = parseInt(document.getElementById('f-floor').value)||null;
   }
@@ -706,6 +749,15 @@ function collect(step) {
   }
 }
 
+// ── SERVICES MULTI-SELECT ─────────────────────────────────
+function toggleService(el, value) {
+  const on = el.dataset.checked === 'true';
+  el.dataset.checked = on ? 'false' : 'true';
+  el.classList.toggle('chk', !on);
+  const err = document.getElementById('err-services');
+  if (err) err.style.display = 'none';
+}
+
 // ── OPTION CARDS ─────────────────────────────────────────────────
 function selOpt(el, name, value) {
   document.querySelectorAll('.oc').forEach(o => {
@@ -718,8 +770,9 @@ function selOpt(el, name, value) {
   el.classList.add('sel');
   const inp = el.querySelector(`input[name="${name}"]`);
   if (inp) inp.checked = true;
-  if (name==='beds')  { const e=document.getElementById('err-beds');  if(e) e.style.display='none'; }
-  if (name==='truck') { const e=document.getElementById('err-truck'); if(e) e.style.display='none'; }
+  if (name==='beds')    { const e=document.getElementById('err-beds');    if(e) e.style.display='none'; }
+  if (name==='truck')   { const e=document.getElementById('err-truck');   if(e) e.style.display='none'; }
+  if (name==='packing') { const e=document.getElementById('err-packing'); if(e) e.style.display='none'; }
 }
 
 function toggleBoxes(val) {
@@ -744,6 +797,7 @@ function applyDisc() {
 
 // ── SUBMIT ───────────────────────────────────────────────────────
 async function submitQuote() {
+  if (!validate(4)) return;
   const heavyItems = [], specLabels = [];
   document.querySelectorAll('#spec-list input[type=checkbox]:checked').forEach(cb => {
     heavyItems.push(parseInt(cb.value));
