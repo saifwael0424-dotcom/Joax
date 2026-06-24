@@ -213,8 +213,9 @@ body::after{content:'';position:fixed;bottom:-150px;left:-150px;width:500px;heig
           <div class="iw"><span class="ico">👤</span><input type="text" id="f-name" placeholder="John Smith" autocomplete="name"></div>
         </div>
         <div class="fg">
-          <label>Phone <span class="opt">(optional)</span></label>
-          <div class="iw"><span class="ico">📞</span><input type="tel" id="f-phone" placeholder="+1 (555) 000-0000" autocomplete="tel"></div>
+          <label>Phone</label>
+          <div class="iw" id="iw-phone"><span class="ico">📞</span><input type="tel" id="f-phone" required placeholder="+1 (555) 000-0000" autocomplete="tel"></div>
+          <div class="ferr" id="err-phone">Please enter a valid phone number.</div>
         </div>
       </div>
 
@@ -652,6 +653,8 @@ function validate(step) {
     setErr('iw-from','err-from',!fr); if (!fr) ok=false;
     const to = document.getElementById('f-to').value.trim();
     setErr('iw-to','err-to',!to); if (!to) ok=false;
+    const phone = document.getElementById('f-phone').value.trim();
+    setErr('iw-phone','err-phone',!eok); if (!eok) ok=false;
   }
   if (step===2) {
     const b = document.querySelector('input[name=beds]:checked');
