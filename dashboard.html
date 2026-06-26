@@ -1394,7 +1394,32 @@ function renderLeads(quotes) {
     const r = q.quote_result || {};
     const date = new Date(q.created_at);
     const status = q.status || 'new';
-    const specialtyItems = (a.heavy_items||[]).length > 0 ? a.heavy_items.join(', ') + ' min each' : '—';
+    const specialtyItems = (a.specialty_labels && a.specialty_labels.length) ? a.specialty_labels.join(', ') : '—';
+
+    const SERVICE_LABELS = {
+      moving: 'Moving', packing: 'Packing Services', unpacking: 'Unpacking Services',
+      storage: 'Storage', senior_downsizing: 'Senior Downsizing',
+      post_move_cleaning: 'Post Move Cleaning Service', move_disassemble: 'Move & Disassemble Only',
+      move_disassemble_reassemble: 'Move with Disassembly & Reassembly',
+    };
+    const PROPERTY_LABELS = { apartment: 'Apartment', house: 'House', condo: 'Condo', storage: 'Storage unit' };
+    const FULLNESS_LABELS = { light: 'Light', medium: 'Medium', heavy: 'Heavy' };
+    const REASON_LABELS = { new_job: 'New job', upsizing: 'Upsizing', downsizing: 'Downsizing', other: 'Other' };
+
+    const servicesDisplay = (a.services && a.services.length)
+      ? a.services.map(s => SERVICE_LABELS[s] || s).join(', ') : '—';
+    const fromAddr = a.address_from || '—';
+    const fromZip  = a.zip_from ? ' (ZIP ' + a.zip_from + ')' : '';
+    const toAddr   = a.address_to || '—';
+    const toZip    = a.zip_to ? ' (ZIP ' + a.zip_to + ')' : '';
+    const unitFloor = [a.unit, a.floor ? 'Floor ' + a.floor : null].filter(Boolean).join(', ') || '—';
+    const propertyDisplay = a.property_type ? (PROPERTY_LABELS[a.property_type] || a.property_type) : '—';
+    const fullnessDisplay = a.load_size ? (FULLNESS_LABELS[a.load_size] || a.load_size) : '—';
+    const reasonDisplay   = a.move_reason ? (REASON_LABELS[a.move_reason] || a.move_reason) : '—';
+    const parkingDisplay  = (a.parking_notes && a.parking_notes.trim()) ? a.parking_notes : '—';
+    const notesDisplay    = (a.notes && a.notes.trim()) ? a.notes : '—';
+    const timeDisplay     = (a.move_time && a.move_time.trim()) ? a.move_time : '—';
+
     return `
       <tr>
         <td>${a.name || '—'}</td>
@@ -1418,22 +1443,47 @@ function renderLeads(quotes) {
       </tr>
       <tr id="details-${q.id}" style="display:none;background:#fafafa">
         <td colspan="8" style="padding:16px 20px">
-          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;font-size:13px">
+
+          <div style="color:#888;font-size:11px;font-weight:600;letter-spacing:0.04em;margin-bottom:8px">SERVICES &amp; ADDRESSES</div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;font-size:13px;margin-bottom:16px">
+            <div style="grid-column:1/-1"><div style="color:#888;font-size:11px;margin-bottom:3px">SERVICES REQUESTED</div><div>${servicesDisplay}</div></div>
+            <div><div style="color:#888;font-size:11px;margin-bottom:3px">FROM</div><div>${fromAddr}${fromZip}</div></div>
+            <div><div style="color:#888;font-size:11px;margin-bottom:3px">TO</div><div>${toAddr}${toZip}</div></div>
+            <div><div style="color:#888;font-size:11px;margin-bottom:3px">UNIT / FLOOR</div><div>${unitFloor}</div></div>
+          </div>
+
+          <div style="color:#888;font-size:11px;font-weight:600;letter-spacing:0.04em;margin-bottom:8px">HOME &amp; MOVE DETAILS</div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;font-size:13px;margin-bottom:16px">
             <div><div style="color:#888;font-size:11px;margin-bottom:3px">MOVE DATE</div><div>${a.move_date||'—'}</div></div>
+            <div><div style="color:#888;font-size:11px;margin-bottom:3px">PROPERTY TYPE</div><div>${propertyDisplay}</div></div>
+            <div><div style="color:#888;font-size:11px;margin-bottom:3px">HOW FULL</div><div>${fullnessDisplay}</div></div>
+            <div><div style="color:#888;font-size:11px;margin-bottom:3px">MOVE TIME</div><div>${timeDisplay}</div></div>
             <div><div style="color:#888;font-size:11px;margin-bottom:3px">TRUCK</div><div>${a.truck?'✅ Yes':'❌ No'}</div></div>
             <div><div style="color:#888;font-size:11px;margin-bottom:3px">FLIGHTS OF STAIRS</div><div>${a.flights > 0 ? a.flights+' flight(s)' : 'None'}</div></div>
             <div><div style="color:#888;font-size:11px;margin-bottom:3px">ELEVATOR</div><div>${a.has_elevator?'✅ Yes':'❌ No'}</div></div>
             <div><div style="color:#888;font-size:11px;margin-bottom:3px">LONG CARRY</div><div>${a.long_carry?'✅ Yes':'❌ No'}</div></div>
             <div><div style="color:#888;font-size:11px;margin-bottom:3px">WEEKEND MOVE</div><div>${a.is_weekend?'✅ Yes':'❌ No'}</div></div>
+            <div><div style="color:#888;font-size:11px;margin-bottom:3px">PARKING / ACCESS</div><div>${parkingDisplay}</div></div>
+          </div>
+
+          <div style="color:#888;font-size:11px;font-weight:600;letter-spacing:0.04em;margin-bottom:8px">ADD-ONS &amp; EXTRAS</div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;font-size:13px;margin-bottom:16px">
             <div><div style="color:#888;font-size:11px;margin-bottom:3px">SPECIALTY ITEMS</div><div>${specialtyItems}</div></div>
             <div><div style="color:#888;font-size:11px;margin-bottom:3px">PACKING BOXES</div><div>${a.packing_boxes > 0 ? a.packing_boxes+' boxes' : 'None'}</div></div>
             <div><div style="color:#888;font-size:11px;margin-bottom:3px">DISCOUNT CODE</div><div>${a.discount_code||'None'}</div></div>
+            <div><div style="color:#888;font-size:11px;margin-bottom:3px">REASON FOR MOVE</div><div>${reasonDisplay}</div></div>
+          </div>
+
+          <div style="color:#888;font-size:11px;font-weight:600;letter-spacing:0.04em;margin-bottom:8px">PRICING</div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;font-size:13px;margin-bottom:16px">
             <div><div style="color:#888;font-size:11px;margin-bottom:3px">MOVERS</div><div>${r.movers||'—'}</div></div>
             <div><div style="color:#888;font-size:11px;margin-bottom:3px">EST. HOURS</div><div>${r.hours||'—'} hrs</div></div>
             <div><div style="color:#888;font-size:11px;margin-bottom:3px">HOURLY RATE</div><div>$${r.rate||'—'}/hr</div></div>
+            <div><div style="color:#888;font-size:11px;margin-bottom:3px">SUBTOTAL</div><div>${r.subtotal ? '$'+r.subtotal.toLocaleString() : '—'}</div></div>
           </div>
-          <div style="margin-top:12px">
-            <div style="color:#888;font-size:11px;margin-bottom:6px">PRICE BREAKDOWN</div>
+
+          <div style="margin-bottom:16px">
+            <div style="color:#888;font-size:11px;font-weight:600;letter-spacing:0.04em;margin-bottom:8px">PRICE BREAKDOWN</div>
             <div style="display:flex;flex-wrap:wrap;gap:8px">
               ${(r.lineItems||[]).map(item => `
                 <div style="padding:4px 10px;background:#fff;border:1px solid #e5e5e5;border-radius:6px;font-size:12px">
@@ -1441,6 +1491,12 @@ function renderLeads(quotes) {
                 </div>`).join('')}
             </div>
           </div>
+
+          <div>
+            <div style="color:#888;font-size:11px;font-weight:600;letter-spacing:0.04em;margin-bottom:8px">CUSTOMER NOTES</div>
+            <div style="background:#fff;border:1px solid #e5e5e5;border-radius:8px;padding:10px 12px;font-size:13px;color:#333;line-height:1.5">${notesDisplay}</div>
+          </div>
+
         </td>
       </tr>`;
   }).join('');
