@@ -194,6 +194,15 @@ body {
   margin-bottom: 24px;
   line-height: 1.5;
 }
+.form-section-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  margin: 22px 0 12px;
+}
+.form-section-label:first-child { margin-top: 0; }
 
 /* ── INPUTS ── */
 .fg { margin-bottom: 16px; }
@@ -206,6 +215,7 @@ body {
   letter-spacing: 0.01em;
 }
 .fg label .opt { font-weight: 400; color: var(--muted); }
+.fg label .req { color: var(--accent); margin-left: 2px; }
 .iw { position: relative; }
 .iw .ico {
   position: absolute; left: 13px; top: 50%;
@@ -232,20 +242,50 @@ body {
 }
 .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
-/* ── RATE EXPLAINER ── */
-.rate-preview {
-  background: var(--brand-light);
-  border-radius: 12px;
-  padding: 14px 16px;
-  margin-top: 10px;
-  display: none;
+/* ── ADVANCED PRICING TOGGLE ── */
+.adv-toggle {
+  display: flex; align-items: center; gap: 6px;
+  width: 100%; justify-content: center;
+  background: var(--bg);
+  border: 1.5px dashed var(--border);
+  border-radius: 11px;
+  padding: 11px 14px;
+  font-size: 13px; font-weight: 600;
+  color: var(--ink2);
+  cursor: pointer;
+  margin: 20px 0 4px;
+  transition: all .15s;
+  font-family: 'Instrument Sans', system-ui, sans-serif;
 }
-.rate-preview.show { display: block; animation: fadeUp .3s both; }
-.rp-title { font-size: 11px; font-weight: 600; color: var(--brand); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 8px; }
-.rp-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
-.rp-item { text-align: center; }
-.rp-val { font-size: 16px; font-weight: 700; color: var(--brand); }
-.rp-label { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.adv-toggle:hover { border-color: var(--brand); color: var(--brand); background: var(--brand-light); }
+.adv-toggle .opt { font-weight: 400; }
+.adv-toggle .chev { margin-left: 6px; transition: transform .2s; font-size: 11px; }
+.adv-toggle.open .chev { transform: rotate(180deg); }
+
+.advanced-section {
+  display: none;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px dashed var(--border);
+}
+.advanced-section.show { display: block; animation: fadeUp .3s both; }
+
+.checkbox-row {
+  display: flex; align-items: center; gap: 9px;
+  font-size: 14px; font-weight: 600; color: var(--ink2);
+  cursor: pointer; user-select: none;
+}
+.checkbox-row input[type="checkbox"] {
+  width: 17px; height: 17px;
+  accent-color: var(--brand);
+  cursor: pointer;
+}
+.hint {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 5px;
+  line-height: 1.4;
+}
 
 /* ── OPTION CARDS ── */
 .og { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
@@ -506,40 +546,66 @@ body {
         <div class="iw"><span class="ico">🏢</span><input type="text" id="d-company" placeholder="e.g. Swift Movers LLC" oninput="updatePreview()"></div>
       </div>
 
+      <div class="fg">
+        <label>2-mover hourly rate <span class="req">*</span></label>
+        <div class="iw"><span class="ico">💲</span><input type="number" id="d-rate2" placeholder="e.g. 175" min="50" oninput="onRate2Change()"></div>
+      </div>
+
       <div class="row2">
         <div class="fg">
-          <label>2-mover rate (with truck)</label>
-          <div class="iw"><span class="ico">💲</span><input type="number" id="d-rate2" placeholder="e.g. 175" min="50" oninput="updateRatePreview()"></div>
+          <label>3-mover rate <span class="opt">auto-suggested</span></label>
+          <div class="iw"><span class="ico">💲</span><input type="number" id="d-rate3" placeholder="—" min="50"></div>
         </div>
         <div class="fg">
-          <label>3-mover rate (with truck)</label>
-          <div class="iw"><span class="ico">💲</span><input type="number" id="d-rate3" placeholder="e.g. 225" min="50" oninput="updateRatePreview()"></div>
+          <label>4-mover rate <span class="opt">auto-suggested</span></label>
+          <div class="iw"><span class="ico">💲</span><input type="number" id="d-rate4" placeholder="—" min="50"></div>
         </div>
       </div>
+      <div class="hint">These auto-fill from your 2-mover rate using typical crew pricing ratios — edit either one if your actual rates are different.</div>
 
-      <div class="rate-preview" id="rate-preview">
-        <div class="rp-title">Auto-calculated rates</div>
-        <div class="rp-grid">
-          <div class="rp-item"><div class="rp-val" id="rp-2">—</div><div class="rp-label">2 movers/hr</div></div>
-          <div class="rp-item"><div class="rp-val" id="rp-3">—</div><div class="rp-label">3 movers/hr</div></div>
-          <div class="rp-item"><div class="rp-val" id="rp-4">—</div><div class="rp-label">4 movers/hr</div></div>
+      <button type="button" class="adv-toggle" id="adv-toggle-btn" onclick="toggleAdvanced()">
+        <span>⚙️ Fine-tune your pricing</span><span class="opt">(optional — improves accuracy)</span><span class="chev">▾</span>
+      </button>
+
+      <div class="advanced-section" id="advanced-section">
+
+        <div class="fg">
+          <label>Avg. hours for a typical 2-bedroom move</label>
+          <div class="iw"><span class="ico">⏱</span><input type="number" id="d-anchor-hours" placeholder="e.g. 5" min="1" step="0.5"></div>
+          <div class="hint">We scale this up or down automatically for smaller and larger homes.</div>
         </div>
-      </div>
 
-      <div class="fg" style="margin-top:16px">
-        <label>Fuel / travel fee <span class="opt">(optional)</span></label>
-        <div class="iw"><span class="ico">⛽</span><input type="number" id="d-fuel" placeholder="e.g. 75" min="0"></div>
-      </div>
-
-      <div class="fg">
-        <label>Minimum hours</label>
-        <div class="iw"><span class="ico">⏱</span>
-          <select id="d-minhours">
-            <option value="2">2 hours minimum</option>
-            <option value="3">3 hours minimum</option>
-            <option value="4">4 hours minimum</option>
-          </select>
+        <div class="fg">
+          <label>Minimum hours</label>
+          <div class="iw"><span class="ico">⏱</span>
+            <select id="d-minhours">
+              <option value="2">2 hours minimum</option>
+              <option value="3">3 hours minimum</option>
+              <option value="4">4 hours minimum</option>
+            </select>
+          </div>
         </div>
+
+        <div class="fg">
+          <label>Fuel / travel fee <span class="opt">(optional)</span></label>
+          <div class="iw"><span class="ico">⛽</span><input type="number" id="d-fuel" placeholder="e.g. 75" min="0"></div>
+        </div>
+
+        <div class="fg">
+          <label>Stairs fee, per flight <span class="opt">(optional)</span></label>
+          <div class="iw"><span class="ico">🪜</span><input type="number" id="d-stairs-fee" placeholder="e.g. 25" min="0"></div>
+        </div>
+
+        <div class="fg">
+          <label class="checkbox-row">
+            <input type="checkbox" id="d-prot-enable" onchange="toggleProtInput()">
+            <span>Offer a protection plan add-on</span>
+          </label>
+          <div class="iw" id="prot-amount-wrap" style="display:none;margin-top:8px">
+            <span class="ico">🛡️</span><input type="number" id="d-prot-amount" placeholder="e.g. 150" min="0">
+          </div>
+        </div>
+
       </div>
 
       <div class="ferr" id="err-config">Please enter your company name and at least the 2-mover rate.</div>
@@ -776,16 +842,36 @@ const DEMO_CLIENT_ID = 'DEMO_CLIENT_UUID_HERE'; // replace with actual demo clie
 let demoConfig = {};
 let qFormData  = {};
 
-// ── RATE PREVIEW ───────────────────────────────────────────────────
-function updateRatePreview() {
-  const r2 = parseFloat(document.getElementById('d-rate2').value) || 0;
-  const r3 = parseFloat(document.getElementById('d-rate3').value) || 0;
-  if (!r2 && !r3) { document.getElementById('rate-preview').classList.remove('show'); return; }
-  const r4 = r3 ? Math.round(r3 * 1.2 / 5) * 5 : Math.round(r2 * 1.4 / 5) * 5;
-  document.getElementById('rp-2').textContent = r2 ? '$'+r2 : '—';
-  document.getElementById('rp-3').textContent = r3 ? '$'+r3 : '—';
-  document.getElementById('rp-4').textContent = r4 ? '$'+r4 : '—';
-  document.getElementById('rate-preview').classList.add('show');
+// ── RATE AUTO-FILL (2-mover rate drives suggested 3/4-mover rates) ──
+// Only auto-fills rate3/rate4 while the user hasn't typed into them directly.
+function onRate2Change() {
+  const r2  = parseFloat(document.getElementById('d-rate2').value) || 0;
+  const r3f = document.getElementById('d-rate3');
+  const r4f = document.getElementById('d-rate4');
+
+  if (!r3f.dataset.edited) {
+    r3f.value = r2 ? Math.round(r2 * 1.3 / 5) * 5 : '';
+  }
+  if (!r4f.dataset.edited) {
+    const r3 = parseFloat(r3f.value) || 0;
+    r4f.value = r3 ? Math.round(r3 * 1.15 / 5) * 5 : (r2 ? Math.round(r2 * 1.6 / 5) * 5 : '');
+  }
+}
+
+document.getElementById('d-rate3').addEventListener('input', function () { this.dataset.edited = '1'; });
+document.getElementById('d-rate4').addEventListener('input', function () { this.dataset.edited = '1'; });
+
+function toggleAdvanced() {
+  const sec = document.getElementById('advanced-section');
+  const btn = document.getElementById('adv-toggle-btn');
+  const willShow = !sec.classList.contains('show');
+  sec.classList.toggle('show', willShow);
+  btn.classList.toggle('open', willShow);
+}
+
+function toggleProtInput() {
+  const on = document.getElementById('d-prot-enable').checked;
+  document.getElementById('prot-amount-wrap').style.display = on ? 'block' : 'none';
 }
 
 function updatePreview() {
@@ -809,21 +895,30 @@ function finishConfig() {
   }
   err.style.display = 'none';
 
-  const rate3 = parseFloat(document.getElementById('d-rate3').value) || Math.round(rate2 * 1.28 / 5) * 5;
-  const rate4 = Math.round(rate3 * 1.2 / 5) * 5;
+  const rate3 = parseFloat(document.getElementById('d-rate3').value) || Math.round(rate2 * 1.3 / 5) * 5;
+  const rate4 = parseFloat(document.getElementById('d-rate4').value) || Math.round(rate3 * 1.15 / 5) * 5;
+
+  const anchorHours = parseFloat(document.getElementById('d-anchor-hours').value) || 5;
+  const minHours    = parseInt(document.getElementById('d-minhours').value) || 2;
+  const fuel        = parseFloat(document.getElementById('d-fuel').value) || 0;
+  const stairsFee   = parseFloat(document.getElementById('d-stairs-fee').value) || 0;
+  const protEnabled = document.getElementById('d-prot-enable').checked;
+  const protAmount  = protEnabled ? (parseFloat(document.getElementById('d-prot-amount').value) || 150) : 0;
 
   demoConfig = {
     company_name: company,
-    rates_with_truck: { 2: rate2, 3: rate3, 4: rate4 },
-    rates_without_truck: { 2: Math.round(rate2*.6/5)*5, 3: Math.round(rate3*.6/5)*5 },
-    base_hours: { 1:3, 2:5, 3:7, 4:9, 5:11 },
-    stairs_addon: { 1:.25, 2:.5, 3:.75, 4:1, 5:1.25 },
-    protection_plan: { 1:110, 2:155, 3:225, 4:290, 5:335 },
-    minimum_hours: parseInt(document.getElementById('d-minhours').value) || 2,
-    fuel_fee: parseFloat(document.getElementById('d-fuel').value) || 0,
+    rates_with_truck:    { 2: rate2, 3: rate3, 4: rate4 },
+    rates_without_truck: { 2: Math.round(rate2*.6/5)*5, 3: Math.round(rate3*.6/5)*5, 4: Math.round(rate4*.6/5)*5 },
+    // Hours scale off a single anchor (avg hours for a 2-bed move) instead of
+    // being hardcoded — this is what the old version got wrong.
+    anchor_hours_2bed: anchorHours,
+    size_multiplier: { 1: 0.65, 2: 1, 3: 1.4, 4: 1.8, 5: 2.15 },
+    minimum_hours: minHours,
+    fuel_fee: fuel,
+    stairs_fee_per_flight: stairsFee,
+    protection_plan_fee: protAmount,
     range_low_pct: 0.9,
     range_high_pct: 1.18,
-    cancellation_fee: 0,
   };
 
   // Update form branding
@@ -943,25 +1038,32 @@ async function submitQuote() {
   // This is instant and reliable — no waiting on the webhook for the price display
   const localResult = calcLocal();
 
-  // Fire the real webhook in the background to send the email
-  // We don't wait for it — the price shows instantly
-  const payload = {
-    ...qFormData,
-    client_slug: CLIENT_SLUG,
-    demo_config: demoConfig,
+  // Fire the dedicated demo-email webhook in the background to send the quote
+  // email. We don't wait for it — the price on screen shows instantly either way.
+  const emailPayload = {
+    customer: {
+      name:  qFormData.name,
+      email: qFormData.email,
+      phone: qFormData.phone,
+    },
     company_name: demoConfig.company_name,
-    heavy_items: [],
-    packing_boxes: 0,
-    has_elevator: false,
-    long_carry: false,
-    // Pass pre-calculated result so the workflow can use it directly for the email
-    pre_calculated: localResult,
+    address_from: qFormData.address_from,
+    address_to:   qFormData.address_to,
+    move_date:    qFormData.move_date || null,
+    quote: {
+      low:    localResult.low,
+      high:   localResult.high,
+      movers: localResult.movers,
+      hours:  localResult.hours,
+      rate:   localResult.rate,
+      lineItems: localResult.lineItems,
+    },
   };
 
-  fetch(`${API_URL}/quote`, {
+  fetch(`${API_URL}/demo-quote-email`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
+    body: JSON.stringify(emailPayload)
   }).catch(() => {}); // silent fail — email is bonus, not blocking
 
   // Small delay to make it feel like it's "calculating"
@@ -977,15 +1079,13 @@ function calcLocal() {
   const flights = qFormData.flights  || 0;
   const truck   = qFormData.truck !== false;
 
-  const bedsKey    = Math.min(beds, 5);
-  const flightsKey = Math.min(flights, 5);
+  const bedsKey = Math.min(beds, 5);
 
-  const baseHoursMap = c.base_hours || { 1:3, 2:5, 3:7, 4:9, 5:11 };
-  const stairsMap    = c.stairs_addon || { 1:.25, 2:.5, 3:.75, 4:1, 5:1.25 };
-
-  const baseHours = parseFloat(baseHoursMap[bedsKey] || baseHoursMap[5] || 6);
-  const stairsAdd = parseFloat(stairsMap[flightsKey] || 0);
-  const hours     = Math.max(baseHours + stairsAdd, c.minimum_hours || 2);
+  // Hours scale off the single anchor value the user gave us for a 2-bed
+  // move, rather than five independently hardcoded numbers.
+  const mult = c.size_multiplier || { 1:0.65, 2:1, 3:1.4, 4:1.8, 5:2.15 };
+  const baseHours = (c.anchor_hours_2bed || 5) * (mult[bedsKey] || mult[5]);
+  const hours = Math.max(baseHours, c.minimum_hours || 2);
 
   const rateTable = truck
     ? (c.rates_with_truck    || { 2:175, 3:225, 4:275 })
@@ -996,14 +1096,18 @@ function calcLocal() {
   const movers   = moverMap[bedsKey] || 2;
   const rate     = parseFloat(rateTable[movers] || rateTable[2] || 150);
 
-  const labor      = Math.round(hours * rate);
-  const protMap    = c.protection_plan || { 1:110, 2:155, 3:225, 4:290, 5:335 };
-  const protection = parseFloat(protMap[bedsKey] || protMap[5] || 0);
-  const fuel       = parseFloat(c.fuel_fee) || 0;
+  const labor = Math.round(hours * rate);
+
+  // Stairs and protection plan are now explicit flat dollar amounts the
+  // user set, not hidden hour-equivalents buried in the base-hours math.
+  const stairsFee     = flights > 0 ? Math.round(flights * (c.stairs_fee_per_flight || 0)) : 0;
+  const protectionFee = parseFloat(c.protection_plan_fee) || 0;
+  const fuel           = parseFloat(c.fuel_fee) || 0;
 
   const lineItems = [{ label: 'Labor', amount: labor }];
-  if (protection > 0) lineItems.push({ label: 'Protection plan', amount: protection });
-  if (fuel > 0)       lineItems.push({ label: 'Fuel / travel fee', amount: fuel });
+  if (stairsFee > 0)     lineItems.push({ label: 'Stairs',           amount: stairsFee });
+  if (protectionFee > 0) lineItems.push({ label: 'Protection plan',  amount: protectionFee });
+  if (fuel > 0)           lineItems.push({ label: 'Fuel / travel fee', amount: fuel });
 
   const subtotal = lineItems.reduce((s, i) => s + i.amount, 0);
   const low      = Math.round(subtotal * (c.range_low_pct  || 0.9));
